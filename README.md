@@ -1,4 +1,4 @@
-# Data Processing Code Base for the InterCarb exercise
+# Data Processing Code Base for the InterCarb Exercise
 
 + This is works in progress.
 + Documentation is minimal.
