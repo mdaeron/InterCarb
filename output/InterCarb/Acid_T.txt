@@ -1,0 +1,4 @@
+Number of mass spectrometers = 25
+Number of labs using 90 ºC acid = 14
+Number of labs using 70 ºC acid = 10
+Number of labs using 25 ºC acid = 1
