@@ -22,18 +22,20 @@ from D47crunch_snapshot import *
 from scipy.stats import norm, kstest, chi2
 import matplotlib.patches as patches
 
-### 18O/16O ACID FRACTIONATION FACTOR
+### 18O/16O ACID FRACTIONATION AS A FUNCTION OF ACID TEMPERATURE
 ### (Kim et al., 2015) <https://doi.org/10.1016/j.gca.2015.02.011>
 alpha18_acid_reaction_calcite = lambda T: exp( 3.48 / (T + 273.15) - 1.47e-3 )
 
 UNKNOWNS = ['ETH-4', 'IAEA-C1', 'IAEA-C2', 'MERCK']
 ANCHORS = ['ETH-1', 'ETH-2', 'ETH-3']
 SAMPLES = ANCHORS + UNKNOWNS
-
 F95 = chi2.ppf(.95, 2)**.5
 
 
 def save_rawdata( rawdata, filename = 'rawdata.csv', mode = 'w', sep = ',', anonymize = True ):
+	'''
+	Save a list of analyses to a CSV file
+	'''
 	fields = [f.split(':') for f in [
 		'UID:s',
 		'Lab:s',
@@ -77,6 +79,9 @@ def create_tree(path):
 
 
 def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_summary.csv'):
+	'''
+	Generate Table S1
+	'''
 	create_tree(path)
 	with open(path, 'w') as f:
 		f.write(','.join([
@@ -109,11 +114,17 @@ def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_sum
 				
 
 def compute_old_to_new_conversion(final_values):
+	'''
+	Compute the conversion equation in section 3.6
+	'''
 	a,b,c = inv(array([[1, 0.010, 0.258], [1, -28.375, 0.256], [1, 0.538, 0.691]])) @ array([[final_values['ETH-1']['D47']],[final_values['ETH-2']['D47']],[final_values['ETH-3']['D47']]])
 	print(f'newΔ47 = {a[0]:.6f} - {-b[0]:.6f} δ47 + {c[0]:.6f} oldΔ47')
 
 
 def MS_effects(labdata, InterCarb_results, path = 'output/InterCarb/'):
+	'''
+	Generate Table 5 and Figure 9
+	'''
 
 	labs_with_Thermo = [lab for lab in InterCarb_results if lab not in UNKNOWNS and 'Thermo' in labdata[lab][lab+'Session01'][0]['Instrument']]
 	labs_with_Nu = [lab for lab in InterCarb_results if lab not in UNKNOWNS and 'Nu' in labdata[lab][lab+'Session01'][0]['Instrument']]
@@ -196,6 +207,9 @@ Number of Isoprime MS = {N_Isoprime}
 
 
 def acid_T_effects(labdata, InterCarb_results, path = 'output/InterCarb/'):
+	'''
+	Generate Table 4 and Figure 8
+	'''
 
 	labs_with_25C_acid = [lab for lab in InterCarb_results if lab not in UNKNOWNS and labdata[lab][lab+'Session01'][0]['Acid T'] == 25]
 	labs_with_70C_acid = [lab for lab in InterCarb_results if lab not in UNKNOWNS and labdata[lab][lab+'Session01'][0]['Acid T'] == 70]
@@ -273,6 +287,9 @@ Number of labs using 25 ºC acid = {N_25C}
 
 
 def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/Table_3_InterCarb_results.csv'):
+	'''
+	Write detailed InterCarb results to Table 3
+	'''
 	create_tree(path)
 	with open(path, 'w') as fid:
 		fid.write('Lab,Session,' + ','.join(UNKNOWNS))
@@ -298,6 +315,9 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/Table_3_I
 		
 
 def ETH1234_vs_HEG():
+	'''
+	Process the data for ETH-1/2/3/4 vs heated/equilibrated CO2
+	'''
 	if RUN_ETH1234_VS_HEG:
 
 		if VERBOSE:
@@ -622,6 +642,9 @@ ETH-1/2/3/4 vs H/EG
 
 
 def run_InterCarb():	
+	'''
+	Process the data for ETH-4, IAEA-C1/2, and MERCK vs ETH-1/2/3
+	'''
 	if RUN_INTERCARB:
 
 		create_tree('output/InterCarb/')
@@ -704,6 +727,9 @@ def run_InterCarb():
 
 
 def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_results.pdf'):
+	'''
+	Generate Figure 5
+	'''
 	
 	create_tree(path)
 	
@@ -780,6 +806,9 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 
 
 def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_tests.pdf'):
+	'''
+	Generate Figure 6
+	'''
 
     fig = figure(figsize = (8,3.7))
     subplots_adjust(.05, .16, .99, .93, .05, .05)
@@ -888,4 +917,3 @@ if __name__ == '__main__':
 
 	final_values = ETH1234_vs_HEG()
 	run_InterCarb()		
-	
