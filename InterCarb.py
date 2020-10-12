@@ -4,16 +4,16 @@
 Data processing for the InterCarb exercise
 '''
 
-__author__    = 'Mathieu Daëron'
+__author__	= 'Mathieu Daëron'
 __contact__   = 'daeron@lsce.ipsl.fr'
 __copyright__ = 'Copyright (c) 2020 Mathieu Daëron'
 __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__date__      = '2020-10'
+__date__	  = '2020-10'
 
-VERBOSE =            False
+VERBOSE =			False
 RUN_ETH1234_VS_HEG = True
-RUN_INTERCARB =      True
-SAVE_RAWDATA =       True
+RUN_INTERCARB =	  True
+SAVE_RAWDATA =	   True
 
 import os
 from glob import glob
@@ -286,32 +286,39 @@ Number of labs using 25 ºC acid = {N_25C}
 		f.write(f',{X:.4f} ± {sX:.4f}')
 
 
-def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/Table_3_InterCarb_results.csv'):
+def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 	'''
 	Write detailed InterCarb results to Table 3
 	'''
 	create_tree(path)
-	with open(path, 'w') as fid:
-		fid.write('Lab,Session,' + ','.join(UNKNOWNS))
-		for lab in sorted(InterCarb_results):
-			if lab not in UNKNOWNS:
-				for session in sorted(InterCarb_results[lab]):
-					if session not in UNKNOWNS:
-						fid.write(f'\n{lab[-2:]},{session[-2:]}')
-						for u in UNKNOWNS:
-							try:
-								fid.write(f',{InterCarb_results[lab][session][u]["D47"]:.4f} ± {InterCarb_results[lab][session][u]["SE_D47"]:.4f}')
-							except KeyError:
-								fid.write(f',—')
-				fid.write(f'\n{lab[-2:]},all')
-				for u in UNKNOWNS:
-					try:
-						fid.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
-					except KeyError:
-						fid.write(f',—')
-		fid.write('\nall,all')
-		for u in UNKNOWNS:
-			fid.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
+	with open(f'{path}Table_S3_InterCarb_results.csv', 'w') as fid:
+		with open(f'{path}Table_3_InterCarb_results.csv', 'w') as fid2:
+			fid.write('Lab,Session,' + ','.join(UNKNOWNS))
+			fid2.write('Lab,' + ','.join(UNKNOWNS))
+			for lab in sorted(InterCarb_results):
+				if lab not in UNKNOWNS:
+					for session in sorted(InterCarb_results[lab]):
+						if session not in UNKNOWNS:
+							fid.write(f'\n{lab[-2:]},{session[-2:]}')
+							for u in UNKNOWNS:
+								try:
+									fid.write(f',{InterCarb_results[lab][session][u]["D47"]:.4f} ± {InterCarb_results[lab][session][u]["SE_D47"]:.4f}')
+								except KeyError:
+									fid.write(f',—')
+					fid.write(f'\n{lab[-2:]},w. avg')
+					fid2.write(f'\n{lab[-2:]}')
+					for u in UNKNOWNS:
+						try:
+							fid.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
+							fid2.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
+						except KeyError:
+							fid.write(f',—')
+							fid2.write(f',—')
+			fid.write('\nall,w. avg')
+			fid2.write('\nw. avg')
+			for u in UNKNOWNS:
+				fid.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
+				fid2.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
 		
 
 def ETH1234_vs_HEG():
@@ -810,107 +817,107 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_test
 	Generate Figure 6
 	'''
 
-    fig = figure(figsize = (8,3.7))
-    subplots_adjust(.05, .16, .99, .93, .05, .05)
-    myaxes = [subplot(2,5,1+k) for k in range(10)]
-    myaxes = myaxes[-5:] + myaxes[:5]
-    sdev = []
-    sdevu = []
-    for k, u in enumerate(UNKNOWNS):
-        D47, sD47 = InterCarb_results[u]['D47'], InterCarb_results[u]['SE_D47']
-        dev = sorted([
-        	(InterCarb_results[l][u]['D47'] - D47)/InterCarb_results[l][u]['SE_D47']
-        	for l in InterCarb_results if l not in UNKNOWNS and u in InterCarb_results[l]
-        	])
-        chi2 = sum([x**2 for x in dev])
-        N = len(dev)
+	fig = figure(figsize = (8,3.7))
+	subplots_adjust(.05, .16, .99, .93, .05, .05)
+	myaxes = [subplot(2,5,1+k) for k in range(10)]
+	myaxes = myaxes[-5:] + myaxes[:5]
+	sdev = []
+	sdevu = []
+	for k, u in enumerate(UNKNOWNS):
+		D47, sD47 = InterCarb_results[u]['D47'], InterCarb_results[u]['SE_D47']
+		dev = sorted([
+			(InterCarb_results[l][u]['D47'] - D47)/InterCarb_results[l][u]['SE_D47']
+			for l in InterCarb_results if l not in UNKNOWNS and u in InterCarb_results[l]
+			])
+		chi2 = sum([x**2 for x in dev])
+		N = len(dev)
 
-        D47u, sD47u = InterCarb_results[u]['autogenic_D47'], InterCarb_results[u]['autogenic_SE_D47']
-        devu = sorted([
-        	(InterCarb_results[l][u]['autogenic_D47'] - D47)/InterCarb_results[l][u]['autogenic_SE_D47']
-        	for l in InterCarb_results if l not in UNKNOWNS and u in InterCarb_results[l]
-        	])
-        chi2u = sum([x**2 for x in devu])
+		D47u, sD47u = InterCarb_results[u]['autogenic_D47'], InterCarb_results[u]['autogenic_SE_D47']
+		devu = sorted([
+			(InterCarb_results[l][u]['autogenic_D47'] - D47)/InterCarb_results[l][u]['autogenic_SE_D47']
+			for l in InterCarb_results if l not in UNKNOWNS and u in InterCarb_results[l]
+			])
+		chi2u = sum([x**2 for x in devu])
 
-        sdev += dev
-        sdevu += devu
+		sdev += dev
+		sdevu += devu
 
-        col1, col2 = [0]*3, [0]*3
-        sca(myaxes[k+1])
-        X = array(dev)
-        Y = arange(N)/(N-1)
-        plot(X, Y, '-', lw = .75, color = col1)
-        plot(X, Y, 'wo', mec = col1, mew = .75, ms = 3.5)
-        x1,x2,y1,y2 = axis()
+		col1, col2 = [0]*3, [0]*3
+		sca(myaxes[k+1])
+		X = array(dev)
+		Y = arange(N)/(N-1)
+		plot(X, Y, '-', lw = .75, color = col1)
+		plot(X, Y, 'wo', mec = col1, mew = .75, ms = 3.5)
+		x1,x2,y1,y2 = axis()
 
-        sca(myaxes[k+6])
-        Xu = array(devu)
-        plot(Xu, Y, '-', lw = .75, color = col2)
-        plot(Xu, Y, 'wo', mec = col2, mew = .75, ms = 3.5)
-        x3,x4,y3,y4 = axis()
-        
-        x1 = -7.5
-        x2 = 7.5
-        y1 = -0.15
-        y2 = 1.15
-        
-        sca(myaxes[k+1])
-        x = linspace(x1, x2)
-        y = norm().cdf(x)
-        plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
-        pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
-        text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-        text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
-        axis([x1,x2,y1,y2])
-        yticks([])
-        xlabel('Sigma-deviation\nof each laboratory')
+		sca(myaxes[k+6])
+		Xu = array(devu)
+		plot(Xu, Y, '-', lw = .75, color = col2)
+		plot(Xu, Y, 'wo', mec = col2, mew = .75, ms = 3.5)
+		x3,x4,y3,y4 = axis()
+		
+		x1 = -7.5
+		x2 = 7.5
+		y1 = -0.15
+		y2 = 1.15
+		
+		sca(myaxes[k+1])
+		x = linspace(x1, x2)
+		y = norm().cdf(x)
+		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+		pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
+		text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
+		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+		axis([x1,x2,y1,y2])
+		yticks([])
+		xlabel('Sigma-deviation\nof each laboratory')
 
-        sca(myaxes[k+6])
-        plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
-        pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
-        text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-        text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
-        axis([x1,x2,y1,y2])
-        yticks([])
-        xticks([])
-        title(u,weight = 'bold', size = 11)
-        
-    sdev = sorted(sdev)
-    sdevu = sorted(sdevu)
-    N = len(sdev)
+		sca(myaxes[k+6])
+		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+		pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
+		text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
+		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+		axis([x1,x2,y1,y2])
+		yticks([])
+		xticks([])
+		title(u,weight = 'bold', size = 11)
+		
+	sdev = sorted(sdev)
+	sdevu = sorted(sdevu)
+	N = len(sdev)
 
-    sca(myaxes[0])
-    X = array(sdev)
-    Y = arange(N)/(N-1)
-    plot(X, Y, '-', lw = .75, color = col1)
-    plot(X, Y, 'wo', mec = col1, mew = .5, ms = 2)
-    x = linspace(x1, x2)
-    y = norm().cdf(x)
-    plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
-    pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
-    text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-    text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
-    axis([x1,x2,y1,y2])
-    xlabel('Sigma-deviation\nof each laboratory')
-    ylabel('Cumulative\ndistribution', labelpad = -8)
-    yticks([0,1])
+	sca(myaxes[0])
+	X = array(sdev)
+	Y = arange(N)/(N-1)
+	plot(X, Y, '-', lw = .75, color = col1)
+	plot(X, Y, 'wo', mec = col1, mew = .5, ms = 2)
+	x = linspace(x1, x2)
+	y = norm().cdf(x)
+	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+	pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
+	text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
+	text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+	axis([x1,x2,y1,y2])
+	xlabel('Sigma-deviation\nof each laboratory')
+	ylabel('Cumulative\ndistribution', labelpad = -8)
+	yticks([0,1])
 
-    sca(myaxes[5])
-    Xu = array(sdevu)
-    plot(Xu, Y, '-', lw = .75, color = col2)
-    plot(Xu, Y, 'wo', mec = col2, mew = .5, ms = 2)
-    plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
-    pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
-    text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-    text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
-    axis([x1,x2,y1,y2])
-    ylabel('Cumulative\ndistribution', labelpad = -8)
-    xticks([])
-    yticks([0,1])
-    title('All samples',weight = 'bold', size = 11)
-        
-    savefig(path)
-    close(fig)
+	sca(myaxes[5])
+	Xu = array(sdevu)
+	plot(Xu, Y, '-', lw = .75, color = col2)
+	plot(Xu, Y, 'wo', mec = col2, mew = .5, ms = 2)
+	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+	pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
+	text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
+	text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+	axis([x1,x2,y1,y2])
+	ylabel('Cumulative\ndistribution', labelpad = -8)
+	xticks([])
+	yticks([0,1])
+	title('All samples',weight = 'bold', size = 11)
+		
+	savefig(path)
+	close(fig)
 	
 	
 if __name__ == '__main__':
