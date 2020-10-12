@@ -6,4 +6,4 @@
 
 ## To do
 
-+ generate Table 3 with lab averages and rename current Table 3 with session averages to S3
+> Nothing right now
