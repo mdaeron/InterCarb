@@ -11,7 +11,7 @@ __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Cl
 __date__	  = '2020-10'
 
 VERBOSE =			False
-RUN_ETH1234_VS_HEG = True
+RUN_ETH1234_VS_HEG = False
 RUN_INTERCARB =	  True
 SAVE_RAWDATA =	   True
 
@@ -731,6 +731,16 @@ def run_InterCarb():
 		MS_effects(labdata, InterCarb_results)
 		interlab_plot(InterCarb_results)
 		KS_tests(InterCarb_results)
+		single_session_plots(labdata)
+
+def single_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
+	create_tree(path)
+	for lab in labdata:
+		for session in labdata[lab]:
+			sp = labdata[lab][session].plot_single_session(session)
+			title(f'{lab} - Session {session[-2:]}\nΔ$_{{47}}$ repeatability = {labdata[lab][session].repeatability["r_D47"]*1000:.1f} ppm')
+			savefig(f'{path}/{session}.pdf')
+			close(sp.fig)
 
 
 def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_results.pdf'):
