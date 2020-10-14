@@ -11,7 +11,7 @@ __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Cl
 __date__	  = '2020-10'
 
 VERBOSE =			 False
-RUN_ETH1234_VS_HEG = False
+RUN_ETH1234_VS_HEG = True
 RUN_INTERCARB =	     True
 SAVE_RAWDATA =	     True
 
