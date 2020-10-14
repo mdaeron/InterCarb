@@ -11,7 +11,7 @@ __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Cl
 __date__	  = '2020-10'
 
 VERBOSE =			 False
-RUN_ETH1234_VS_HEG = True
+RUN_ETH1234_VS_HEG = False
 RUN_INTERCARB =	     True
 SAVE_RAWDATA =	     True
 
@@ -733,15 +733,28 @@ def run_InterCarb():
 		KS_tests(InterCarb_results)
 		single_session_plots(labdata)
 
+
 def single_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 	create_tree(path)
 	for lab in labdata:
 		for session in labdata[lab]:
-			sp = labdata[lab][session].plot_single_session(session)
+
+			d47max = max([r['d47'] for r in labdata[lab][session]])
+
+			sp = labdata[lab][session].plot_single_session(
+				session,
+				error_contour_interval = 3e-3,
+				xylimits = (d47max - 65, d47max + 5, 0.1, 0.9),
+				)
+
+			sp.fig.set_size_inches(7,5)
+
 			for x in sp.anchor_avg + sp.unknown_avg:
 				x.set_alpha(0.25)
 				x.set_linewidth(3)
+
 			title(f'{lab} - Session {session[-2:]}\nΔ$_{{47}}$ repeatability = {labdata[lab][session].repeatability["r_D47"]*1000:.1f} ppm')
+
 			savefig(f'{path}/{session}.pdf')
 			close(sp.fig)
 
