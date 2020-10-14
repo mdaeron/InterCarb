@@ -11,7 +11,7 @@ __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Cl
 __date__	  = '2020-10'
 
 VERBOSE =			 False
-RUN_ETH1234_VS_HEG = True
+RUN_ETH1234_VS_HEG = False
 RUN_INTERCARB =	     True
 SAVE_RAWDATA =	     True
 
@@ -778,8 +778,9 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 			[l for l in InterCarb_results if l not in UNKNOWNS and sample in InterCarb_results[l]],
 			key = lambda l: InterCarb_results[l][sample]['SE_D47']
 			)
-		x, y_inf, y_sup, x_labels = 1, 1e3, -1e3, {}
+		x, y_inf, y_sup, x_labels = 0, 1e3, -1e3, {}
 		for lab in sorted_labs :
+			x += 1/(1 + len(sorted_labs))
 			chisq_t += ( (InterCarb_results[lab][sample]['D47'] - InterCarb_results[sample]['D47']) / InterCarb_results[lab][sample]['SE_D47'] )**2
 			Nf += 1
 			errorbar( x, InterCarb_results[lab][sample]['D47'], F95 * InterCarb_results[lab][sample]['SE_D47'],
@@ -790,8 +791,9 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 				capsize = 4,
 				capthick = 1,
 				)
+			rect_width = .015
 			gca().add_patch(Rectangle(
-				(x-.15,InterCarb_results[lab][sample]['autogenic_D47']-F95*InterCarb_results[lab][sample]['autogenic_SE_D47']), .3, 3.92*InterCarb_results[lab][sample]['autogenic_SE_D47'],
+				(x-rect_width/2,InterCarb_results[lab][sample]['autogenic_D47']-F95*InterCarb_results[lab][sample]['autogenic_SE_D47']), rect_width, 3.92*InterCarb_results[lab][sample]['autogenic_SE_D47'],
 				linewidth = 1,
 				edgecolor = 'k',
 				facecolor = 'w',
@@ -800,7 +802,6 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 			y_inf = min(y_inf, InterCarb_results[lab][sample]['D47'] - F95 * InterCarb_results[lab][sample]['SE_D47'])
 			y_sup = max(y_sup, InterCarb_results[lab][sample]['D47'] + F95 * InterCarb_results[lab][sample]['SE_D47'])
 			x_labels[lab] = x
-			x += 1
 			text(
 				x_labels[lab],
 				0.005 + InterCarb_results[lab][sample]['D47'] + F95 * InterCarb_results[lab][sample]['SE_D47'],
@@ -813,7 +814,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 
 		axhline( InterCarb_results[sample]['D47'], c = 'r', zorder = -100, lw = 1.5 )
 
-		x1,x2,y1,y2 = axis([0, x, y_inf - 0.05*(y_sup-y_inf), y_sup + 0.1*(y_sup-y_inf)])
+		x1,x2,y1,y2 = axis([0, 1, y_inf - 0.05*(y_sup-y_inf), y_sup + 0.1*(y_sup-y_inf)])
 		global_yrange = max(global_yrange, y2-y1)
 		xticks([])
 		kw = dict(size = 10, transform = gca().transAxes, va = 'bottom', ha = 'left')
