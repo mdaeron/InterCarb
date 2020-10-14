@@ -738,6 +738,9 @@ def single_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 	for lab in labdata:
 		for session in labdata[lab]:
 			sp = labdata[lab][session].plot_single_session(session)
+			for x in sp.anchor_avg + sp.unknown_avg:
+				x.set_alpha(0.25)
+				x.set_linewidth(3)
 			title(f'{lab} - Session {session[-2:]}\nΔ$_{{47}}$ repeatability = {labdata[lab][session].repeatability["r_D47"]*1000:.1f} ppm')
 			savefig(f'{path}/{session}.pdf')
 			close(sp.fig)
