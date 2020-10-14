@@ -107,7 +107,7 @@ def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_sum
 					f'{len(session["data"]) - len({r["Sample"] for r in session["data"]})}',
 					f'{session["d13Cwg_VPDB"]:.2f}', f'{session["d18Owg_VSMOW"]:.2f}',
 					f'{session["a"]:.2f}',
-					f'{session["b"]:.1e}' if abs(session["b"]/session["SE_b"]) > 1.96 else f'({session["b"]:.1e})',
+					f'{session["b"]:.1e}' if abs(session["b"]/session["SE_b"]) > F95 else f'({session["b"]:.1e})',
 					f'{session["c"]:.3f}',
 					f'{session["r_d13C_VPDB"]*1000:.0f}', f'{session["r_d18O_VSMOW"]*1000:.0f}', f'{session["r_D47"]*1000:.1f}',
 					]))
@@ -470,7 +470,7 @@ ETH-1/2/3/4 vs H/EG
 			
 				eX_autogenic = labinfo[lab]['rD47'] / labinfo[lab][s]['N']**.5
 				gca().add_patch(Rectangle(
-					(X - 1.96 * eX_autogenic, Y - 0.125), 3.92 * eX_autogenic, .25,
+					(X - F95 * eX_autogenic, Y - 0.125), 2 * F95 * eX_autogenic, .25,
 					linewidth = 1.2,
 					edgecolor = 'k',
 					facecolor = 'w',
@@ -769,7 +769,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 		for lab in sorted_labs :
 			chisq_t += ( (InterCarb_results[lab][sample]['D47'] - InterCarb_results[sample]['D47']) / InterCarb_results[lab][sample]['SE_D47'] )**2
 			Nf += 1
-			errorbar( x, InterCarb_results[lab][sample]['D47'], 1.96 * InterCarb_results[lab][sample]['SE_D47'],
+			errorbar( x, InterCarb_results[lab][sample]['D47'], F95 * InterCarb_results[lab][sample]['SE_D47'],
 				marker = 'None',
 				ls = 'None',
 				ecolor = 'k',
@@ -778,19 +778,19 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 				capthick = 1,
 				)
 			gca().add_patch(Rectangle(
-				(x-.15,InterCarb_results[lab][sample]['autogenic_D47']-1.96*InterCarb_results[lab][sample]['autogenic_SE_D47']), .3, 3.92*InterCarb_results[lab][sample]['autogenic_SE_D47'],
+				(x-.15,InterCarb_results[lab][sample]['autogenic_D47']-F95*InterCarb_results[lab][sample]['autogenic_SE_D47']), .3, 3.92*InterCarb_results[lab][sample]['autogenic_SE_D47'],
 				linewidth = 1,
 				edgecolor = 'k',
 				facecolor = 'w',
 				zorder = 100,
 				))
-			y_inf = min(y_inf, InterCarb_results[lab][sample]['D47'] - 1.96 * InterCarb_results[lab][sample]['SE_D47'])
-			y_sup = max(y_sup, InterCarb_results[lab][sample]['D47'] + 1.96 * InterCarb_results[lab][sample]['SE_D47'])
+			y_inf = min(y_inf, InterCarb_results[lab][sample]['D47'] - F95 * InterCarb_results[lab][sample]['SE_D47'])
+			y_sup = max(y_sup, InterCarb_results[lab][sample]['D47'] + F95 * InterCarb_results[lab][sample]['SE_D47'])
 			x_labels[lab] = x
 			x += 1
 			text(
 				x_labels[lab],
-				0.005 + InterCarb_results[lab][sample]['D47'] + 1.96 * InterCarb_results[lab][sample]['SE_D47'],
+				0.005 + InterCarb_results[lab][sample]['D47'] + F95 * InterCarb_results[lab][sample]['SE_D47'],
 				str(int(lab[-2:])),
 				ha = 'center',
 				va = 'center',
