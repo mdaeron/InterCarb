@@ -732,14 +732,30 @@ def run_InterCarb():
 		MS_effects(labdata, InterCarb_results)
 		interlab_plot(InterCarb_results)
 		KS_tests(InterCarb_results)
-		intra_lab_session_plots(labdata)
+		intra_lab_session_plots(labdata, InterCarb_results)
 		single_session_plots(labdata)
 
 
-def intra_lab_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
+def compute_lab_rsmwd( InterCarb_results, lab ):
+	chisq, Nf = 0, 0
+	for sample in UNKNOWNS :
+		D47, sD47 = [], []
+		sessions = sorted([s for s in InterCarb_results[lab] if s not in UNKNOWNS and sample in InterCarb_results[lab][s]])
+		if len(sessions) > 1:
+			Nf -= 1
+			for s in sessions :
+				chisq += ((InterCarb_results[lab][s][sample]['D47'] - InterCarb_results[lab][sample]['D47']) / InterCarb_results[lab][s][sample]['SE_D47'])**2
+				Nf += 1
+	if Nf :
+		RMSWD = sqrt(chisq / Nf)#		 print(f'RMSWD for {lab} sessions is {RMSWD:.6f}')
+		return RMSWD
+	else :
+		return 0
+
+def intra_lab_session_plots(labdata, InterCarb_results, path = 'output/InterCarb/Session plots/'):
 	create_tree(path)
 	for lab in labdata:
-		rmswd = 0.
+		rmswd = compute_lab_rsmwd( InterCarb_results, lab )
 		sessions = sorted([s for s in labdata[lab]])
 		Ns = len(sessions)
 		if Ns < 2 : continue
@@ -755,33 +771,18 @@ def intra_lab_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 				subplot(Ns-1,Ns-1,(Ns-1)*i+j)
 #				 gca().tick_params(axis='both', direction='in')
 				for sample in samples:
-#					 G1 = [r for r in db1 if r['Sample'] == sample]
 					allX1 = [r['D47'] for r in labdata[lab][session1].samples[sample]['data']]
 					X1 = labdata[lab][session1].samples[sample]['D47']
 					SE_X1 = labdata[lab][session1].samples[sample]['SE_D47']
 					autogenic_SE_X1 = labdata[lab][session1].repeatability['r_D47'] / len(allX1)**.5
-#					 Y1,sY1 = w_avg([r['d47'] for r in G1], [r['eD47raw'] for r in G1])
-#					 Z1,sZ1 = w_avg([r['D47raw'] for r in G1], [r['eD47raw'] for r in G1])
-#					 a1,b1,c1,CM1 = [normalization[session1][k] for k in ['a','b','c','CM']]
-#					 X1 = (Z1 - b1*Y1 - c1)/a1
-#					 sX1 = sZ1/a1
-#					 sX1_total = total_error(a1, b1, c1, CM1, Y1, Z1, sZ1)
 
-#					 G2 = [r for r in db2 if r['Sample'] == sample]
 					allX2 = [r['D47'] for r in labdata[lab][session2].samples[sample]['data']]
 					X2 = labdata[lab][session2].samples[sample]['D47']
 					SE_X2 = labdata[lab][session2].samples[sample]['SE_D47']
 					autogenic_SE_X2 = labdata[lab][session2].repeatability['r_D47'] / len(allX2)**.5
-#					 Y2,sY2 = w_avg([r['d47'] for r in G2], [r['eD47raw'] for r in G2])
-#					 Z2,sZ2 = w_avg([r['D47raw'] for r in G2], [r['eD47raw'] for r in G2])
-#					 a2,b2,c2,CM2 = [normalization[session2][k] for k in ['a','b','c','CM']]
-#					 X2 = (Z2 - b2*Y2 - c2)/a2
-#					 sX2 = sZ2/a2
-#					 sX2_total = total_error(a2, b2, c2, CM2, Y2, Z2, sZ2)
 
 					plot( allX1, [X2]*len(allX1), 'k+', ms = 2, mew = .5 )
 					plot( [X1]*len(allX2), allX2, 'k+', ms = 2, mew = .5 )
-#					text( X1, X2, sample, va = 'center', ha = 'center' )
 					gca().add_artist(
 						patches.Ellipse(
 							 xy = (X1,X2), width = 2 * F95_2df * autogenic_SE_X1, height = 2 * F95_2df * autogenic_SE_X2,
@@ -808,8 +809,7 @@ def intra_lab_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 		text(
 			.5,
 			.99,
-# 			f'$\\mathbf{{{lab}}}$\nRMSWD = {rmswd:.3f}',
-			f'$\\mathbf{{{lab}}}$',
+			f'$\\mathbf{{{lab}}}$\nRMSWD = {rmswd:.3f}',
 			ha = 'center',
 			va = 'top',
 			size = 10,
