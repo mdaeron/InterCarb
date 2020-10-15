@@ -12,8 +12,8 @@ __date__	  = '2020-10'
 
 VERBOSE =			 False
 RUN_ETH1234_VS_HEG = True
-RUN_INTERCARB =	     True
-SAVE_RAWDATA =	     True
+RUN_INTERCARB =		 True
+SAVE_RAWDATA =		 True
 
 import os
 from glob import glob
@@ -739,7 +739,86 @@ def run_InterCarb():
 def intra_lab_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 	create_tree(path)
 	for lab in labdata:
-		pass
+		rmswd = 0.
+		sessions = sorted([s for s in labdata[lab]])
+		Ns = len(sessions)
+		if Ns < 2 : continue
+		e,f = .55, 1.4
+		g = 2*e+Ns*f
+		fig = figure( figsize = (g,g) )
+		subplots_adjust(e/g,e/g,1-e/g,1-e/g,0.08,.08)
+		for i in range(Ns) :
+			for j in range(Ns-i-1) :
+				j += i+1
+				session1, session2 = sessions[j], sessions[i]
+				samples = sorted([s for s in labdata[lab][session1].unknowns if s in labdata[lab][session2].unknowns])
+				subplot(Ns-1,Ns-1,(Ns-1)*i+j)
+#				 gca().tick_params(axis='both', direction='in')
+				for sample in samples:
+#					 G1 = [r for r in db1 if r['Sample'] == sample]
+					allX1 = [r['D47'] for r in labdata[lab][session1].samples[sample]['data']]
+					X1 = labdata[lab][session1].samples[sample]['D47']
+					SE_X1 = labdata[lab][session1].samples[sample]['SE_D47']
+					autogenic_SE_X1 = labdata[lab][session1].repeatability['r_D47'] / len(allX1)**.5
+#					 Y1,sY1 = w_avg([r['d47'] for r in G1], [r['eD47raw'] for r in G1])
+#					 Z1,sZ1 = w_avg([r['D47raw'] for r in G1], [r['eD47raw'] for r in G1])
+#					 a1,b1,c1,CM1 = [normalization[session1][k] for k in ['a','b','c','CM']]
+#					 X1 = (Z1 - b1*Y1 - c1)/a1
+#					 sX1 = sZ1/a1
+#					 sX1_total = total_error(a1, b1, c1, CM1, Y1, Z1, sZ1)
+
+#					 G2 = [r for r in db2 if r['Sample'] == sample]
+					allX2 = [r['D47'] for r in labdata[lab][session2].samples[sample]['data']]
+					X2 = labdata[lab][session2].samples[sample]['D47']
+					SE_X2 = labdata[lab][session2].samples[sample]['SE_D47']
+					autogenic_SE_X2 = labdata[lab][session2].repeatability['r_D47'] / len(allX2)**.5
+#					 Y2,sY2 = w_avg([r['d47'] for r in G2], [r['eD47raw'] for r in G2])
+#					 Z2,sZ2 = w_avg([r['D47raw'] for r in G2], [r['eD47raw'] for r in G2])
+#					 a2,b2,c2,CM2 = [normalization[session2][k] for k in ['a','b','c','CM']]
+#					 X2 = (Z2 - b2*Y2 - c2)/a2
+#					 sX2 = sZ2/a2
+#					 sX2_total = total_error(a2, b2, c2, CM2, Y2, Z2, sZ2)
+
+					plot( allX1, [X2]*len(allX1), 'k+', ms = 2, mew = .5 )
+					plot( [X1]*len(allX2), allX2, 'k+', ms = 2, mew = .5 )
+#					text( X1, X2, sample, va = 'center', ha = 'center' )
+					gca().add_artist(
+						patches.Ellipse(
+							 xy = (X1,X2), width = 2 * F95_2df * autogenic_SE_X1, height = 2 * F95_2df * autogenic_SE_X2,
+							 lw = .5, fc = 'none', ec = 'k', ls = '-', alpha = 1/3 )
+							 )
+					gca().add_artist(
+						 patches.Ellipse(
+							 xy = (X1,X2), width = 2 * F95_2df * SE_X1, height = 2 * F95_2df * SE_X2,
+							 lw = 1, fc = 'none', ec = 'k', ls = '-' )
+							 )
+				xmin,xmax = .325, .775
+				plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
+				axis([xmin,xmax,xmin,xmax])
+				xticks([.4,.5,.6,.7])
+				yticks([.4,.5,.6,.7])
+				grid(alpha = .333)
+				if j == i+1 :
+					xlabel(session1[5:])
+					ylabel(session2[5:])
+				else :
+					gca().set_xticklabels( ['']*4 )
+					gca().set_yticklabels( ['']*4 )
+					gca().tick_params(axis='both', length=0)
+		text(
+			.5,
+			.99,
+# 			f'$\\mathbf{{{lab}}}$\nRMSWD = {rmswd:.3f}',
+			f'$\\mathbf{{{lab}}}$',
+			ha = 'center',
+			va = 'top',
+			size = 10,
+#			 weight = 'bold',
+			transform = fig.transFigure
+			)
+
+		savefig(f'{path}{lab}.pdf')
+		close(fig)
 
 
 def single_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
