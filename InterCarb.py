@@ -757,12 +757,18 @@ def intra_lab_session_plots(labdata, InterCarb_results, path = 'output/InterCarb
 	for lab in labdata:
 		rmswd = compute_lab_rsmwd( InterCarb_results, lab )
 		sessions = sorted([s for s in labdata[lab]])
+
 		Ns = len(sessions)
 		if Ns < 2 : continue
 		e,f = .55, 1.4
 		g = 2*e+Ns*f
-		fig = figure( figsize = (g,g) )
-		subplots_adjust(e/g,e/g,1-e/g,1-e/g,0.08,.08)
+		if Ns > 2:
+			fig = figure( figsize = (g,g) )
+			subplots_adjust(e/g,e/g,1-e/g,1-e/g,0.08,.08)
+		else:
+			fig = figure( figsize = (g,g+1) )
+			subplots_adjust(e/g,e/g*2.3,1-e/g,1-e/g*0.8,0.08,.08)
+
 		for i in range(Ns) :
 			for j in range(Ns-i-1) :
 				j += i+1
@@ -806,16 +812,55 @@ def intra_lab_session_plots(labdata, InterCarb_results, path = 'output/InterCarb
 					gca().set_xticklabels( ['']*4 )
 					gca().set_yticklabels( ['']*4 )
 					gca().tick_params(axis='both', length=0)
-		text(
-			.5,
-			.99,
-			f'$\\mathbf{{{lab}}}$\nRMSWD = {rmswd:.3f}',
-			ha = 'center',
-			va = 'top',
-			size = 10,
-#			 weight = 'bold',
-			transform = fig.transFigure
-			)
+
+		caption = f'''
+Comparison of Δ$_{{47}}$ values
+for unknown samples obtained
+in {Ns} sessions by Lab {lab[-2:]}.
+Black markers show individual
+analyses from each session.
+Thick black ellipses correspond
+to 95 % confidence limits on
+session-averaged values with fully
+propagated uncertainties. Thin
+gray ellipses correspond to 95 %
+confidence limits not accounting
+for standardization errors.
+'''[1:-1]
+		if Ns > 2:
+			text(
+				.5,
+				1-e/g*0.8,
+				f'$\\mathbf{{{lab}}}$   (RMSWD = {rmswd:.3f})',
+				ha = 'center',
+				va = 'bottom',
+				size = 10,
+	#			 weight = 'bold',
+				transform = fig.transFigure
+				)
+			text(
+				.05, .05, caption,
+				va = 'bottom',ha = 'left',
+				transform = fig.transFigure,
+				size = 8,
+				)
+		else:
+			text(
+				.5,
+				.97,
+				f'$\\mathbf{{{lab}}}$\n(RMSWD = {rmswd:.3f})',
+				ha = 'center',
+				va = 'top',
+				size = 10,
+	#			 weight = 'bold',
+				transform = fig.transFigure
+				)
+			text(
+				.5, 0.05, '\n'.join([f'{x} {y}' for x,y in zip(caption.split('\n')[::2], caption.split('\n')[1::2]+['']) ]),
+				va = 'bottom',ha = 'center',
+				transform = fig.transFigure,
+				size = 8,
+				)
 
 		savefig(f'{path}{lab}.pdf')
 		close(fig)
