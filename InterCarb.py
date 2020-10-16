@@ -834,7 +834,19 @@ def single_session_plots(labdata, path = 'output/InterCarb/Session plots/'):
 				xylimits = (d47max - 65, d47max + 5, 0.1, 0.9),
 				)
 
-			sp.fig.set_size_inches(7,5)
+			sp.fig.set_size_inches(7,7)
+			subplots_adjust(left=.1, bottom=0.25, right=.95, top=.9)
+			
+			text(
+				.17, .03, f'''
+All analyses (cross markers) in Session {session[-2:]} of Lab {lab[-2:]}.
+Anchors are plotted in red and unknown in blue.
+Average Δ$_{{47}}$ values for each sample are plotted as thick blue and red lines.
+Standardization errors are mapped as gray contours.
+				'''[1:-1],
+				va = 'bottom',ha = 'left',
+				transform = sp.fig.transFigure,
+				)
 
 			for x in sp.anchor_avg + sp.unknown_avg:
 				x.set_alpha(0.25)
