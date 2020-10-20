@@ -636,6 +636,9 @@ ETH-1/2/3/4 vs H/EG
 		legend(prop = {'size': 9})
 		savefig('output/ETH1234_vs_HEG/Fig_4_ETH1234_new_vs_old.pdf')
 
+		for u,x,y in zip(['ETH-1', 'ETH-2', 'ETH-3', 'ETH-4'], X, Y):
+			print(f'Offset from old to new values of {u} is {(y-x)*1000:.1f} ppm ({(y-a*x-b)*1000:+.1f} ppm from the linear scaling in Fig. 4)')
+
 		compute_old_to_new_conversion(final_values)
 
 		return final_values
