@@ -614,10 +614,11 @@ ETH-1/2/3/4 vs H/EG
 		plot(x, a*x+b, '-', lw = .75, color = [.5]*3, dashes = (6,2), zorder = -100)
 		x = array([max(X),1])
 		plot(x, a*x+b, '-', lw = .75, color = [.5]*3, dashes = (2,3), zorder = -100)
-		x = array([0,1])
+		for x,y,t in zip(X[1:], Y[1:], ['ETH-1+2', 'ETH-3', 'ETH-4']):
+			text(x + 0.025, y - 0.015, t, va = 'top', ha = 'left', size = 8)
 
-		xx = 0.5
-		text(xx, a*xx+b-0.1, f'slope = {a:.3f}', va = 'center', ha = 'center', size = 10, color = [.5]*3, rotation = 43)
+		xx = 0.4
+		text(xx, a*xx+b+0.1, f'slope = {a:.3f}', va = 'center', ha = 'center', size = 10, color = [.5]*3, rotation = 43)
 
 		plot([.0266], [.0266], 'wo', ms = 5, mec = 'r', mew = 1, label = '1000°C heated gases')
 		plot([.0266], [.0266+0.05], 'wo', ms = 5, mec = 'r', mew = 1)
@@ -630,7 +631,7 @@ ETH-1/2/3/4 vs H/EG
 		gca().add_patch(arr)
 		text(.0266+0.07, 0.0266+0.025, '+0.05 ‰ (partial re-equilibration of HG?)', va = 'center', ha = 'left', color = 'r', size = 9)
 
-		axis([*x, *x])
+		axis([0, 1, 0, 1])
 		xlabel('Previously determined values\n(Bernasconi et al., 2018)')
 		ylabel('New values (this study)')
 		legend(prop = {'size': 9})
