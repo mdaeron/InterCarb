@@ -603,7 +603,7 @@ ETH-1/2/3/4 vs H/EG
 		subplots_adjust(.15,.17,.95,.97)
 
 
-		plot([.9196], [.9196], 'wo', ms = 5, mec = 'g', mew = 1, label = '25°C equil. gases')
+		plot([.9196], [.9196], 'wo', ms = 5, mec = 'g', mew = 1, label = '25$\,$°C equil. gases')
 
 		X = [ .258,  .256,  .691,  .507]
 		Y = [final_values[s]['D47'] for s in ethsamples]
@@ -620,7 +620,7 @@ ETH-1/2/3/4 vs H/EG
 		xx = 0.4
 		text(xx, a*xx+b+0.1, f'slope = {a:.3f}', va = 'center', ha = 'center', size = 10, color = [.5]*3, rotation = 43)
 
-		plot([.0266], [.0266], 'wo', ms = 5, mec = 'r', mew = 1, label = '1000°C heated gases')
+		plot([.0266], [.0266], 'wo', ms = 5, mec = 'r', mew = 1, label = '1000$\,$°C heated gases')
 		plot([.0266], [.0266+0.05], 'wo', ms = 5, mec = 'r', mew = 1)
 
 		plot(X, Y, 'ws', mec = 'k', ms = 5, mew = 1, label = 'ETH standards')
