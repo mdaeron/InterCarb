@@ -6,4 +6,5 @@
 
 ## To do
 
-+ Add captions to the undocumented figures
++ Check that all undocumented figures have captions
++ Add N to Table 3
