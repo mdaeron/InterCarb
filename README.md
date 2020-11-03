@@ -8,3 +8,4 @@
 
 + Check that all undocumented figures have captions
 + Add N to Table 3, Figs 3 (and 5?)
++ Try to combine Tables 1 and 2
