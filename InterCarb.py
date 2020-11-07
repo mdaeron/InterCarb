@@ -114,11 +114,11 @@ def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_sum
 					]))
 				
 
-def compute_old_to_new_conversion(final_values):
+def compute_old_to_new_conversion(new_eth_values):
 	'''
 	Compute the conversion equation in section 3.6
 	'''
-	a,b,c = inv(array([[1, 0.010, 0.258], [1, -28.375, 0.256], [1, 0.538, 0.691]])) @ array([[final_values['ETH-1']['D47']],[final_values['ETH-2']['D47']],[final_values['ETH-3']['D47']]])
+	a,b,c = inv(array([[1, 0.010, 0.258], [1, -28.375, 0.256], [1, 0.538, 0.691]])) @ array([[new_eth_values['ETH-1']['D47']],[new_eth_values['ETH-2']['D47']],[new_eth_values['ETH-3']['D47']]])
 	print(f'newΔ47 = {a[0]:.6f} - {-b[0]:.6f} δ47 + {c[0]:.6f} oldΔ47')
 
 
@@ -183,13 +183,13 @@ Number of Isoprime MS = {N_Isoprime}
 					xy = (Xavg,Yavg), width = 2*F95_2df*sXavg, height = 2*F95_2df*sYavg,
 					lw = 1, fc = 'none', ec = 'k', ls = '-', alpha = 1 )
 					)
-		xmin,xmax = .325, .775
+		xmin,xmax = .25, .675
 		p = 1-chi2.cdf(chisq,4)
 		text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n(p = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
 		plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
 		axis([xmin,xmax,xmin,xmax])
-		xticks([.4,.5,.6,.7])
-		yticks([.4,.5,.6,.7])
+		xticks([.3,.4,.5,.6])
+		yticks([.3,.4,.5,.6])
 		xlabel(xmodel)
 		ylabel(ymodel)
 
@@ -264,13 +264,13 @@ Number of labs using 25 ºC acid = {N_25C}
 				lw = 1, fc = 'none', ec = 'k', ls = '-', alpha = 1 )
 				)
 
-	xmin,xmax = .325, .775
+	xmin,xmax = .25, .675
 	p = 1-chi2.cdf(chisq,4)
 	text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n(p = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
 	plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
 	axis([xmin,xmax,xmin,xmax])
-	xticks([.4,.5,.6,.7])
-	yticks([.4,.5,.6,.7])
+	xticks([.3,.4,.5,.6])
+	yticks([.3,.4,.5,.6])
 	xlabel('70 ºC acid reaction')
 	ylabel('90 ºC acid reaction')
 
@@ -414,6 +414,7 @@ ETH-1/2/3/4 vs H/EG
 							labinfo[lab][sample]['D47'] += .066 # from Petersen et al. (2019)
 						elif acid_T == 90:
 							labinfo[lab][sample]['D47'] += .088 # from Petersen et al. (2019)
+						labinfo[lab][sample]['D47'] -= .088     # Define values as 90C acid-reacted by convention   <-----
 
 
 		total_N_of_analyses = sum([labinfo[lab]['N_of_CO2_analyses'] + labinfo[lab]['N_of_ETH_analyses'] for lab in labinfo])
@@ -454,13 +455,17 @@ ETH-1/2/3/4 vs H/EG
 		subplots_adjust(.02, .1, .98, .95, .1, .25)
 		ax = {s: subplot(221+k) for k,s in enumerate(['ETH-4', 'ETH-3', 'ETH-2', 'ETH-1'])}
 
-		final_values = {}
+		new_eth_values = {}
 		for sk, s in enumerate(ax):
 
 			X = [labinfo[lab][s]['D47'] for lab in labinfo]
 			sX = [labinfo[lab][s]['sD47'] for lab in labinfo]
 			Xo, sXo = w_avg(X, sX)
-			final_values[s] = {'D47': Xo, 'sD47': sXo}
+			new_eth_values[s] = {
+				'D47': Xo,
+				'sD47': sXo,
+				'N': sum([labinfo[lab][s]['N'] for lab in labinfo if s in labinfo[lab]]),
+				}
 		
 			sca(ax[s])
 			for k, lab in enumerate(sorted(labinfo, key = lambda l: labinfo[l][s]['D47'])):
@@ -524,7 +529,7 @@ ETH-1/2/3/4 vs H/EG
 		myaxes = [subplot(240+k) for k in [3,4,7,8]]
 
 		for k, u in enumerate(['ETH-4', 'ETH-3', 'ETH-2', 'ETH-1']):
-			D47, sD47 = final_values[u]['D47'], final_values[u]['sD47']
+			D47, sD47 = new_eth_values[u]['D47'], new_eth_values[u]['sD47']
 
 			sigma_values = sorted(
 				[
@@ -606,7 +611,8 @@ ETH-1/2/3/4 vs H/EG
 		plot([.9196], [.9196], 'wo', ms = 5, mec = 'g', mew = 1, label = '25$\,$°C equil. gases')
 
 		X = [ .258,  .256,  .691,  .507]
-		Y = [final_values[s]['D47'] for s in ethsamples]
+# 		X = [x + 0.004 for x in X] # account for Bernasconi et al. using AFF of 0.062 instead of 0.066?
+		Y = [new_eth_values[s]['D47'] + 0.088 for s in ethsamples]
 		a,b = polyfit(X, Y, 1)
 		x = array([0,min(X)])
 		plot(x, a*x+b, '-', lw = .75, color = [.5]*3, dashes = (2,3), zorder = -100)
@@ -633,23 +639,23 @@ ETH-1/2/3/4 vs H/EG
 
 		axis([0, 1, 0, 1])
 		xlabel('Previously determined values\n(Bernasconi et al., 2018)')
-		ylabel('New values (this study)')
+		ylabel('New values (this study) + 0.088 ‰')
 		legend(prop = {'size': 9})
 		savefig('output/ETH1234_vs_HEG/Fig_4_ETH1234_new_vs_old.pdf')
 
 		for u,x,y in zip(['ETH-1', 'ETH-2', 'ETH-3', 'ETH-4'], X, Y):
 			print(f'Offset from old to new values of {u} is {(y-x)*1000:.1f} ppm ({(y-a*x-b)*1000:+.1f} ppm from the linear scaling in Fig. 4)')
 
-		compute_old_to_new_conversion(final_values)
+		compute_old_to_new_conversion(new_eth_values)
 
-		return final_values
+		return new_eth_values
 
 	else:
 		return {
-			'ETH-1': {'D47': 0.2920368766271781, 'sD47': 0.0018830130448527374},
-			'ETH-2': {'D47': 0.2948560677529254, 'sD47': 0.0017907001951658636},
-			'ETH-3': {'D47': 0.7007967024253421, 'sD47': 0.0016113573967636997},
-			'ETH-4': {'D47': 0.5369344061975312, 'sD47': 0.0019727851254116363},
+			'ETH-1': {'D47': 0.2040368766271781, 'sD47': 0.0018830130448527374},
+			'ETH-2': {'D47': 0.2068560677529254, 'sD47': 0.0017907001951658636},
+			'ETH-3': {'D47': 0.6127967024253421, 'sD47': 0.0016113573967636997},
+			'ETH-4': {'D47': 0.4489344061975312, 'sD47': 0.0019727851254116363},
 			}
 
 
@@ -665,7 +671,7 @@ def run_InterCarb():
 		try:
 			D47data.Nominal_D47 = {}
 			for sample in ['ETH-1', 'ETH-2', 'ETH-3']:
-				D47data.Nominal_D47[sample] = round(final_values[sample]['D47'], 4)
+				D47data.Nominal_D47[sample] = round(new_eth_values[sample]['D47'], 4)
 		except NameError:
 			D47data.Nominal_D47 = {'ETH-1': 0.2920, 'ETH-2': 0.2949, 'ETH-3': 0.7008}
 		print(D47data.Nominal_D47)
@@ -965,8 +971,8 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 		x1,x2,y1,y2 = axis([0, 1, y_inf - 0.05*(y_sup-y_inf), y_sup + 0.1*(y_sup-y_inf)])
 		global_yrange = max(global_yrange, y2-y1)
 		xticks([])
-		kw = dict(size = 10, transform = gca().transAxes, va = 'bottom', ha = 'left')
-		text(0.02, 0.01,
+		kw = dict(size = 10, transform = gca().transAxes, va = 'bottom' if sample == 'MERCK' else 'top', ha = 'left')
+		text(0.03, 0.01 if sample == 'MERCK' else 0.98,
 			f"$\\mathbf{{{sample}}}$: {InterCarb_results[sample]['D47']:.4f} ± {InterCarb_results[sample]['SE_D47']:.4f} ‰ (1SE)",
 			**kw)
 # 		if Nf:
@@ -1095,7 +1101,15 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_test
 	close(fig)
 	
 	
+def save_Table_1(new_eth_values, path = 'output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv'):
+	create_tree(path)
+	with open(path, 'w') as fid:
+		fid.write(';'.join(['Standard'] + [f"ETH-{k} (N = {new_eth_values['ETH-'+k]['N']})" for k in '1234']) + '\n')
+		fid.write(';'.join(['Δ47 (‰, CDES, 90 °C acid)'] + [f"{new_eth_values['ETH-'+k]['D47']:.4f} ± {new_eth_values['ETH-'+k]['sD47']:.4f} (1SE)" for k in '1234']))
+	
+
 if __name__ == '__main__':
 
-	final_values = ETH1234_vs_HEG()
+	new_eth_values = ETH1234_vs_HEG()
+	save_Table_1(new_eth_values)
 	run_InterCarb()		
