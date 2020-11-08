@@ -196,7 +196,7 @@ Number of Isoprime MS = {N_Isoprime}
 	savefig(path + 'Fig_9_MS_effects.pdf')
 	close(fig)
 	
-	with open(path + 'Table_5_InterCarb_MS_effects.csv', 'w') as f:
+	with open(path + 'Table_4_InterCarb_MS_effects.csv', 'w') as f:
 		f.write('Sample,MAT 253 vs Isoprime 100,Nu Perspective vs MAT 253,Isoprime 100 vs Nu Perspective')
 		for u in UNKNOWNS:
 			f.write(f'\n{u},{out[u]["Thermo vs Isoprime"][0]:.4f} ± {out[u]["Thermo vs Isoprime"][1]:.4f},{out[u]["Nu vs Thermo"][0]:.4f} ± {out[u]["Nu vs Thermo"][1]:.4f},{out[u]["Isoprime vs Nu"][0]:.4f} ± {out[u]["Isoprime vs Nu"][1]:.4f}')
@@ -277,7 +277,7 @@ Number of labs using 25 ºC acid = {N_25C}
 	savefig(path + 'Fig_8_Acid_T_effects.pdf')
 	close(fig)
 
-	with open(path + 'Table_4_InterCarb_Acid_T_effects.csv', 'w') as f:
+	with open(path + 'Table_3_InterCarb_Acid_T_effects.csv', 'w') as f:
 		f.write('Sample,Δ47 (70 ºC acid),Δ47 (90 ºC acid),Difference')
 		for u in UNKNOWNS:
 			f.write(f'\n{u},{out[u][70]["D47"]:.4f} ± {out[u][70]["SE_D47"]:.4f},{out[u][90]["D47"]:.4f} ± {out[u][90]["SE_D47"]:.4f},{out[u][90]["D47"]-out[u][70]["D47"]:.4f} ± {sqrt(out[u][70]["SE_D47"]**2 + out[u][90]["SE_D47"]**2):.4f}')
@@ -293,9 +293,10 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 	'''
 	create_tree(path)
 	with open(f'{path}Table_S3_InterCarb_results.csv', 'w') as fid:
-		with open(f'{path}Table_3_InterCarb_results.csv', 'w') as fid2:
+		with open(f'{path}Table_2_InterCarb_results.csv', 'w') as fid2:
 			fid.write('Lab,Session,' + ','.join(UNKNOWNS))
-			fid2.write('Lab,' + ','.join(UNKNOWNS))
+			fid2.write(',' + ','.join([f'{u},{u}' for u in UNKNOWNS]))
+			fid2.write('\nLab,' + ','.join(['N, Δ47 (‰ I-CDES ± 1SE)' for u in UNKNOWNS]))
 			for lab in sorted(InterCarb_results):
 				if lab not in UNKNOWNS:
 					for session in sorted(InterCarb_results[lab]):
@@ -311,15 +312,16 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 					for u in UNKNOWNS:
 						try:
 							fid.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
+							fid2.write(f',{InterCarb_results[lab][u]["N"]}')
 							fid2.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
 						except KeyError:
 							fid.write(f',—')
-							fid2.write(f',—')
+							fid2.write(f',—,—')
 			fid.write('\nall,w. avg')
 			fid2.write('\nw. avg')
 			for u in UNKNOWNS:
 				fid.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
-				fid2.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
+				fid2.write(f',{InterCarb_results[u]["N"]},{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
 		
 
 def ETH1234_vs_HEG():
@@ -435,12 +437,6 @@ ETH-1/2/3/4 vs H/EG
 				if k != 'rawdata':
 					print(f'{k} = {labinfo[lab][k]}')
 
-		with open('output/ETH1234_vs_HEG/Table_2_ETH1234_vs_HEG.csv', 'w') as fid:
-			fid.write('Lab,Sessions,N (H/E CO2),N (ETH-1), Δ47 (ETH-1), ± 95 %,Stat. weight (ETH-1),N (ETH-2), Δ47 (ETH-2), ± 95 %,Stat. weight (ETH-2),N (ETH-3), Δ47 (ETH-3), ± 95 %,Stat. weight (ETH-3),N (ETH-4), Δ47 (ETH-4), ± 95 %,Stat. weight (ETH-4)')
-			for lab in labinfo:
-				fid.write(f'\n{lab},{labinfo[lab]["N_of_sessions"]},{labinfo[lab]["N_of_CO2_analyses"]},'
-					+ ','.join([f'{labinfo[lab][s]["N"]},{labinfo[lab][s]["D47"]:.4f},{labinfo[lab][s]["eD47"]:.4f},{labinfo[lab][s]["wD47"]:.3f}' for s in ethsamples]))
-
 		kw_errorbar = dict(
 			ecolor = 'k',
 			ls = 'None',
@@ -499,7 +495,7 @@ ETH-1/2/3/4 vs H/EG
 			yticks([])
 			axis([None, None, -1, len(labinfo)])
 			if sk > 1:
-				xlabel('Δ$_{47}$ ($25\,$°C acid)')
+				xlabel('Δ$_{47}$ ($90\,$°C acid)')
 			text(0, 1.01, s, va = 'bottom', weight = 'bold', size = 12, transform = ax[s].transAxes)
 		
 			axvline(Xo, color = 'r', lw = 1, zorder = -200)
@@ -514,13 +510,60 @@ ETH-1/2/3/4 vs H/EG
 			txt = 'Statistical weights:'
 			for T in weights:
 				txt += f'\n{T:g}$\,$°C acid: {100*weights[T]:.0f} %'
-			text(.03, .95, txt, va = 'top', transform = gca().transAxes, size = 8)
+			text(.02, .97, txt, va = 'top', transform = gca().transAxes, size = 9)
 	
 			ax[s].xaxis.set_major_locator(MultipleLocator(.050))
 			ax[s].xaxis.set_minor_locator(MultipleLocator(.010))
 
 		savefig(f'output/ETH1234_vs_HEG/Fig_3_ETH1234_vs_HEG.pdf')
 		close(fig)
+
+# 		with open('output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv', 'w') as fid:
+# 			fid.write(',Sessions,N (H/E CO2),N (ETH-1), Δ47 (ETH-1), SE,Stat. weight (ETH-1),N (ETH-2), Δ47 (ETH-2), SE,Stat. weight (ETH-2),N (ETH-3), Δ47 (ETH-3), SE,Stat. weight (ETH-3),N (ETH-4), Δ47 (ETH-4), SE,Stat. weight (ETH-4)')
+# 			for lab in labinfo:
+# 				fid.write(f'\n{lab},{labinfo[lab]["N_of_sessions"]},{labinfo[lab]["N_of_CO2_analyses"]},'
+# 					+ ','.join([f'{labinfo[lab][s]["N"]},{labinfo[lab][s]["D47"]:.4f},{labinfo[lab][s]["sD47"]:.4f},{labinfo[lab][s]["wD47"]:.3f}' for s in ethsamples]))
+# 			fid.write(f'\nAll labs,{sum([labinfo[lab]["N_of_sessions"] for lab in labinfo])},{sum([labinfo[lab]["N_of_CO2_analyses"] for lab in labinfo])},'
+# 				+ ','.join([
+# 					f'{sum([labinfo[lab][s]["N"] for lab in labinfo])},{new_eth_values[s]["D47"]:.4f},{new_eth_values[s]["sD47"]:.4f},'
+# 					for s in ethsamples
+# 					]))
+
+		table1 = [['', 'Laboratory', 'all'] + [k for k in 'ABCDEFGHI']]
+		table1 += [
+			['', 'N of sessions']
+			+ [str(sum([labinfo[lab]["N_of_sessions"] for lab in labinfo]))]
+			+ [str(labinfo[lab]["N_of_sessions"]) for lab in labinfo]
+			]
+		table1 += [
+			['', 'N of H/E CO2']
+			+ [str(sum([labinfo[lab]["N_of_CO2_analyses"] for lab in labinfo]))]
+			+ [str(labinfo[lab]["N_of_CO2_analyses"]) for lab in labinfo]
+			]
+		for s in ethsamples:
+			table1 += [
+				[s, 'N of analyses']
+				+ [str(sum([labinfo[lab][s]["N"] for lab in labinfo]))]
+				+ [str(labinfo[lab][s]["N"]) for lab in labinfo]
+				]
+			table1 += [
+				['', 'Δ47 (90 °C acid)']
+				+ [f'{new_eth_values[s]["D47"]:.4f}']
+				+ [f'{labinfo[lab][s]["D47"]:.4f}' for lab in labinfo]
+				]
+			table1 += [
+				['', '± 1SE']
+				+ [f'{new_eth_values[s]["sD47"]:.4f}']
+				+ [f'{labinfo[lab][s]["sD47"]:.4f}' for lab in labinfo]
+				]
+			table1 += [
+				['', 'Statistical weight', '']
+				+ [f'{labinfo[lab][s]["wD47"]:.3f}' for lab in labinfo]
+				]
+			
+		with open('output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv', 'w') as fid:
+			fid.write('\n'.join([','.join(r) for r in table1]))
+
 
 
 		all_sigma_values = []
@@ -710,16 +753,18 @@ def run_InterCarb():
 					save_rawdata(rd, 'output/InterCarb/Table_S2_InterCarb_data.csv', 'a')
 				for u in UNKNOWNS:
 					if u in rd.unknowns:
-						InterCarb_results[lab][session][u] = {k: rd.unknowns[u][k] for k in ['D47', 'SE_D47']}
+						InterCarb_results[lab][session][u] = {k: rd.unknowns[u][k] for k in ['D47', 'SE_D47', 'N']}
 						InterCarb_results[lab][session][u]['autogenic_SE_D47'] = rd.repeatability['r_D47'] / sqrt(rd.unknowns[u]['N'])
 
 		for lab in labs:
 			for u in UNKNOWNS:
+				N = [InterCarb_results[lab][s][u]['N'] for s in InterCarb_results[lab] if u in InterCarb_results[lab][s]]
 				X = [InterCarb_results[lab][s][u]['D47'] for s in InterCarb_results[lab] if u in InterCarb_results[lab][s]]
 				sX = [InterCarb_results[lab][s][u]['SE_D47'] for s in InterCarb_results[lab] if u in InterCarb_results[lab][s]]
 				if X:
 					InterCarb_results[lab][u] = {}
 					InterCarb_results[lab][u]['D47'], InterCarb_results[lab][u]['SE_D47'] = w_avg(X, sX)
+					InterCarb_results[lab][u]['N'] = sum(N)
 				sX = [InterCarb_results[lab][s][u]['autogenic_SE_D47'] for s in InterCarb_results[lab] if u in InterCarb_results[lab][s]]
 				if X:
 					InterCarb_results[lab][u]['autogenic_D47'], InterCarb_results[lab][u]['autogenic_SE_D47'] = w_avg(X, sX)
@@ -730,6 +775,7 @@ def run_InterCarb():
 			X = [InterCarb_results[lab][u]['D47'] for lab in InterCarb_results if u in InterCarb_results[lab]]
 			sX = [InterCarb_results[lab][u]['SE_D47'] for lab in InterCarb_results if u in InterCarb_results[lab]]
 			InterCarb_results[u]['D47'], InterCarb_results[u]['SE_D47'] = w_avg(X, sX)
+			InterCarb_results[u]['N'] = sum([InterCarb_results[lab][u]['N'] for lab in InterCarb_results if u in InterCarb_results[lab]])
 		
 			X = [InterCarb_results[lab][u]['autogenic_D47'] for lab in InterCarb_results if u in InterCarb_results[lab]]
 			sX = [InterCarb_results[lab][u]['autogenic_SE_D47'] for lab in InterCarb_results if u in InterCarb_results[lab]]
@@ -982,7 +1028,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 # 			text(0.02, 0.02,
 # 				f'RMSWD = {(chisq_t/Nf)**.5:.2f}',
 # 				**kw)
-		ylabel('Δ$_{47}$ (‰)')
+		ylabel('Δ$_{47}$ (‰, I-CDES)')
 
 	for ks, sample in enumerate(UNKNOWNS):
 		sca(axes[ks])
@@ -1101,15 +1147,15 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_test
 	close(fig)
 	
 	
-def save_Table_1(new_eth_values, path = 'output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv'):
-	create_tree(path)
-	with open(path, 'w') as fid:
-		fid.write(';'.join(['Standard'] + [f"ETH-{k} (N = {new_eth_values['ETH-'+k]['N']})" for k in '1234']) + '\n')
-		fid.write(';'.join(['Δ47 (‰, CDES, 90 °C acid)'] + [f"{new_eth_values['ETH-'+k]['D47']:.4f} ± {new_eth_values['ETH-'+k]['sD47']:.4f} (1SE)" for k in '1234']))
+# def save_Table_1(new_eth_values, path = 'output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv'):
+# 	create_tree(path)
+# 	with open(path, 'w') as fid:
+# 		fid.write(';'.join(['Standard'] + [f"ETH-{k} (N = {new_eth_values['ETH-'+k]['N']})" for k in '1234']) + '\n')
+# 		fid.write(';'.join(['Δ47 (‰, CDES, 90 °C acid)'] + [f"{new_eth_values['ETH-'+k]['D47']:.4f} ± {new_eth_values['ETH-'+k]['sD47']:.4f} (1SE)" for k in '1234']))
 	
 
 if __name__ == '__main__':
 
 	new_eth_values = ETH1234_vs_HEG()
-	save_Table_1(new_eth_values)
+# 	save_Table_1(new_eth_values)
 	run_InterCarb()		
