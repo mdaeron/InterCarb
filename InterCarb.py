@@ -114,12 +114,16 @@ def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_sum
 					]))
 				
 
-def compute_old_to_new_conversion(new_eth_values):
+def compute_old_to_new_conversion(new_eth_values, path = 'output/InterCarb/Eq_A7.txt'):
 	'''
 	Compute the conversion equation in section 3.6
 	'''
+	create_tree(path)
 	a,b,c = inv(array([[1, 0.010, 0.258], [1, -28.375, 0.256], [1, 0.538, 0.691]])) @ array([[new_eth_values['ETH-1']['D47']],[new_eth_values['ETH-2']['D47']],[new_eth_values['ETH-3']['D47']]])
-	print(f'newΔ47 = {a[0]:.6f} - {-b[0]:.6f} δ47 + {c[0]:.6f} oldΔ47')
+	a,b,c = a[0], b[0], c[0]
+	with open(path, 'w') as fid:
+		fid.write(f'(A.7)   newΔ47 = {a:.6f} - {-b:.6f} δ47 + {c:.6f} oldΔ47')
+		fid.write(f'\nThus ETH-4 (δ47 = -28.8 ‰, oldΔ47 = 0.507 ‰): newΔ47 = {a-b*28.8+c*0.507:.4f} ‰')
 
 
 def MS_effects(labdata, InterCarb_results, path = 'output/InterCarb/'):
