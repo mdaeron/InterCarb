@@ -513,7 +513,7 @@ ETH-1/2/3/4 vs H/EG
 				}
 			txt = 'Statistical weights:'
 			for T in weights:
-				txt += f'\n{T:g}$\,$°C acid: {100*weights[T]:.0f} %'
+				txt += f'\n{T:g}$\,$°C acid: {100*weights[T]:.1f} %'
 			text(.02, .97, txt, va = 'top', transform = gca().transAxes, size = 9)
 	
 			ax[s].xaxis.set_major_locator(MultipleLocator(.050))
