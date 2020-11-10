@@ -699,10 +699,10 @@ ETH-1/2/3/4 vs H/EG
 
 	else:
 		return {
-			'ETH-1': {'D47': 0.2040368766271781, 'sD47': 0.0018830130448527374},
-			'ETH-2': {'D47': 0.2068560677529254, 'sD47': 0.0017907001951658636},
-			'ETH-3': {'D47': 0.6127967024253421, 'sD47': 0.0016113573967636997},
-			'ETH-4': {'D47': 0.4489344061975312, 'sD47': 0.0019727851254116363},
+			'ETH-1': {'D47': 0.2064686164883584, 'sD47': 0.0016662896249396652, 'N': 194}
+			'ETH-2': {'D47': 0.20916717321557368, 'sD47': 0.0015742691429492005, 'N': 177},
+			'ETH-3': {'D47': 0.6127323668021546, 'sD47': 0.001465375568204861, 'N': 225},
+			'ETH-4': {'D47': 0.45060146865039874, 'sD47': 0.0018645208530485462, 'N': 122},
 			}
 
 
@@ -715,12 +715,9 @@ def run_InterCarb():
 		create_tree('output/InterCarb/')
 
 		print('\nNOMINAL Δ47 VALUES USED IN INTERCARB:')
-		try:
-			D47data.Nominal_D47 = {}
-			for sample in ['ETH-1', 'ETH-2', 'ETH-3']:
-				D47data.Nominal_D47[sample] = round(new_eth_values[sample]['D47'], 4)
-		except NameError:
-			D47data.Nominal_D47 = {'ETH-1': 0.2920, 'ETH-2': 0.2949, 'ETH-3': 0.7008}
+		D47data.Nominal_D47 = {}
+		for sample in ['ETH-1', 'ETH-2', 'ETH-3']:
+			D47data.Nominal_D47[sample] = round(new_eth_values[sample]['D47'], 4)
 		print(D47data.Nominal_D47)
 
 		print('Reading raw data...')
@@ -1164,5 +1161,6 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_test
 if __name__ == '__main__':
 
 	new_eth_values = ETH1234_vs_HEG()
+	print(new_eth_values)
 # 	save_Table_1(new_eth_values)
 	run_InterCarb()		
