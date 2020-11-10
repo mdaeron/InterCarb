@@ -727,6 +727,9 @@ def run_InterCarb():
 		rawdata = D47data()
 		rawdata.read('input/InterCarb/rawdata.csv')
 		labs = sorted({r['Lab'] for r in rawdata})
+		
+		with open('output/InterCarb/Tally.txt', 'w') as fid:
+			fid.write(f'{len(rawdata)} analyses from {len(labs)} labs')
 
 		for r in rawdata:
 			r['LabSession'] = r['Session']
