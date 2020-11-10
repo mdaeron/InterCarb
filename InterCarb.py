@@ -300,7 +300,7 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 		with open(f'{path}Table_2_InterCarb_results.csv', 'w') as fid2:
 			fid.write('Lab,Session,' + ','.join(UNKNOWNS))
 			fid2.write(',' + ','.join([f'{u},{u}' for u in UNKNOWNS]))
-			fid2.write('\nLab,' + ','.join(['N, Δ47 (‰ I-CDES ± 1SE)' for u in UNKNOWNS]))
+			fid2.write('\nLab,' + ','.join(['Δ47 (‰ I-CDES ± 1SE), N' for u in UNKNOWNS]))
 			for lab in sorted(InterCarb_results):
 				if lab not in UNKNOWNS:
 					for session in sorted(InterCarb_results[lab]):
@@ -316,8 +316,8 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 					for u in UNKNOWNS:
 						try:
 							fid.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
-							fid2.write(f',{InterCarb_results[lab][u]["N"]}')
 							fid2.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
+							fid2.write(f',{InterCarb_results[lab][u]["N"]}')
 						except KeyError:
 							fid.write(f',—')
 							fid2.write(f',—,—')
@@ -325,7 +325,7 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 			fid2.write('\nw. avg')
 			for u in UNKNOWNS:
 				fid.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
-				fid2.write(f',{InterCarb_results[u]["N"]},{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
+				fid2.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f},{InterCarb_results[u]["N"]}')
 		
 
 def ETH1234_vs_HEG():
@@ -533,7 +533,7 @@ ETH-1/2/3/4 vs H/EG
 # 					for s in ethsamples
 # 					]))
 
-		table1 = [['', 'Laboratory', 'all'] + [k for k in 'ABCDEFGHI']]
+		table1 = [['', 'Laboratory', 'all'] + [k for k in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:len(labs)]]]
 		table1 += [
 			['', 'N of sessions']
 			+ [str(sum([labinfo[lab]["N_of_sessions"] for lab in labinfo]))]
