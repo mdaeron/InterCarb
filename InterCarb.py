@@ -861,11 +861,11 @@ def intra_lab_session_plots(labdata, InterCarb_results, path = 'output/InterCarb
 							 xy = (X1,X2), width = 2 * F95_2df * SE_X1, height = 2 * F95_2df * SE_X2,
 							 lw = 1, fc = 'none', ec = 'k', ls = '-' )
 							 )
-				xmin,xmax = .325, .775
+				xmin,xmax = .25, .695
 				plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
 				axis([xmin,xmax,xmin,xmax])
-				xticks([.4,.5,.6,.7])
-				yticks([.4,.5,.6,.7])
+				xticks([.3, .4,.5,.6])
+				yticks([.3, .4,.5,.6])
 				grid(alpha = .333)
 				if j == i+1 :
 					xlabel(session1[5:])
