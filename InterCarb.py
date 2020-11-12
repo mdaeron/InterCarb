@@ -380,7 +380,9 @@ ETH-1/2/3/4 vs H/EG
 						drifts = [l.strip() for l in f.readlines()]
 					for session in rawdata.sessions:
 						for drift in drifts:
-							rawdata.sessions[session][drift] = True
+							if len({r['TimeTag'] for r in rawdata.sessions[session]['data']}) > 1:
+								rawdata.sessions[session][drift] = True
+								print(f'{lab} {session} has {drift}.')
 
 				if not os.path.exists('output'):
 					os.makedirs('output')
@@ -426,9 +428,9 @@ ETH-1/2/3/4 vs H/EG
 		total_N_of_analyses = sum([labinfo[lab]['N_of_CO2_analyses'] + labinfo[lab]['N_of_ETH_analyses'] for lab in labinfo])
 		total_N_of_CO2_analyses = sum([labinfo[lab]['N_of_CO2_analyses'] for lab in labinfo])
 		total_N_of_ETH_analyses = sum([labinfo[lab]['N_of_ETH_analyses'] for lab in labinfo])
-		print(f'\nTotal number of {total_N_of_analyses} analyses from {len(labinfo)} labs.\n')
-		print(f'\nTotal number of {total_N_of_CO2_analyses} CO2 analyses.\n')
-		print(f'\nTotal number of {total_N_of_ETH_analyses} ETH analyses.\n')
+
+		with open('output/ETH1234_vs_HEG/Tally.txt', 'w') as fid:
+			fid.write(f'{total_N_of_analyses} analyses from {len(labs)} labs, including {total_N_of_CO2_analyses} CO2 and {total_N_of_ETH_analyses} ETH analyses.')
 		for sample in ethsamples:
 			sum_of_weights = sum([labinfo[lab][sample]['sD47']**-2 for lab in labinfo if sample in labinfo[lab]])
 			for lab in labinfo:
@@ -699,7 +701,7 @@ ETH-1/2/3/4 vs H/EG
 
 	else:
 		return {
-			'ETH-1': {'D47': 0.2064686164883584, 'sD47': 0.0016662896249396652, 'N': 194}
+			'ETH-1': {'D47': 0.2064686164883584, 'sD47': 0.0016662896249396652, 'N': 194},
 			'ETH-2': {'D47': 0.20916717321557368, 'sD47': 0.0015742691429492005, 'N': 177},
 			'ETH-3': {'D47': 0.6127323668021546, 'sD47': 0.001465375568204861, 'N': 225},
 			'ETH-4': {'D47': 0.45060146865039874, 'sD47': 0.0018645208530485462, 'N': 122},
