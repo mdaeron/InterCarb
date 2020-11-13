@@ -14,7 +14,7 @@ VERBOSE =			 False
 RUN_ETH1234_VS_HEG = True
 RUN_INTERCARB =		 True
 SAVE_RAWDATA =		 True
-IMAGE_FROMAT =       'pdf' # 'pdf' or 'png' or 'jpg'
+IMAGE_FORMAT =       'pdf' # 'pdf' or 'png' or 'jpg'
 
 import os
 from glob import glob
@@ -203,7 +203,7 @@ Number of Isoprime MS = {N_Isoprime}
 		xlabel(xmodel)
 		ylabel(ymodel)
 
-	savefig(path + 'Fig_9_MS_effects')
+	savefig(path + 'Fig_8_MS_effects')
 	close(fig)
 	
 	with open(path + 'Table_4_InterCarb_MS_effects.csv', 'w') as f:
@@ -284,7 +284,7 @@ Number of labs using 25 ºC acid = {N_25C}
 	xlabel('70 ºC acid reaction')
 	ylabel('90 ºC acid reaction')
 
-	savefig(path + 'Fig_8_Acid_T_effects')
+	savefig(path + 'Fig_7_Acid_T_effects')
 	close(fig)
 
 	with open(path + 'Table_3_InterCarb_Acid_T_effects.csv', 'w') as f:
@@ -527,7 +527,7 @@ ETH-1/2/3/4 vs H/EG
 			ax[s].xaxis.set_major_locator(MultipleLocator(.050))
 			ax[s].xaxis.set_minor_locator(MultipleLocator(.010))
 
-		savefig(f'output/ETH1234_vs_HEG/Fig_3_ETH1234_vs_HEG')
+		savefig(f'output/ETH1234_vs_HEG/Fig_2_ETH1234_vs_HEG')
 		close(fig)
 
 # 		with open('output/ETH1234_vs_HEG/Table_1_ETH1234_vs_HEG.csv', 'w') as fid:
@@ -654,7 +654,7 @@ ETH-1/2/3/4 vs H/EG
 		ylabel('Cumulative\ndistribution', labelpad = -8)
 		yticks([0,1])
 
-		savefig('output/ETH1234_vs_HEG/Fig_7_KS_tests_ETH1234_vs_HEG')
+		savefig('output/ETH1234_vs_HEG/Fig_6_KS_tests_ETH1234_vs_HEG')
 		close(fig)
 
 
@@ -696,7 +696,7 @@ ETH-1/2/3/4 vs H/EG
 		xlabel('Previously determined values\n(Bernasconi et al., 2018)')
 		ylabel('New values (this study) + 0.088 ‰')
 		legend(prop = {'size': 9})
-		savefig('output/ETH1234_vs_HEG/Fig_4_ETH1234_new_vs_old')
+		savefig('output/ETH1234_vs_HEG/Fig_3_ETH1234_new_vs_old')
 
 		for u,x,y in zip(['ETH-1', 'ETH-2', 'ETH-3', 'ETH-4'], X, Y):
 			print(f'Offset from old to new values of {u} is {(y-x)*1000:.0f} ppm ({(y-a*x-b)*1000:+.1f} ppm from the linear scaling in Fig. 4)')
@@ -971,7 +971,7 @@ Standardization errors are mapped as gray contours.
 			close(sp.fig)
 
 
-def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_results'):
+def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_results'):
 	'''
 	Generate Figure 5
 	'''
@@ -1051,7 +1051,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_re
 	close(fig)
 
 
-def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_6_InterCarb_KS_tests'):
+def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_tests'):
 	'''
 	Generate Figure 6
 	'''

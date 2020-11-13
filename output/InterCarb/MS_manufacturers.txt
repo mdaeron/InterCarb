@@ -1,4 +1,0 @@
-Number of mass spectrometers = 25
-Number of Thermo MS = 16
-Number of Nu MS = 8
-Number of Isoprime MS = 1
