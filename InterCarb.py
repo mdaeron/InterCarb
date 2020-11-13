@@ -14,6 +14,7 @@ VERBOSE =			 False
 RUN_ETH1234_VS_HEG = True
 RUN_INTERCARB =		 True
 SAVE_RAWDATA =		 True
+IMAGE_FROMAT =       'pdf' # 'pdf' or 'png' or 'jpg'
 
 import os
 from glob import glob
@@ -24,7 +25,7 @@ import matplotlib.patches as patches
 
 from matplotlib import rcParams
 rcParams['savefig.dpi']    = 200
-rcParams['savefig.format'] = 'pdf' # 'pdf' or 'png' or 'jpg'
+rcParams['savefig.format'] = IMAGE_FORMAT
 
 
 ### 18O/16O ACID FRACTIONATION AS A FUNCTION OF ACID TEMPERATURE
