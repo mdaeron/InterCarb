@@ -24,7 +24,7 @@ import matplotlib.patches as patches
 
 from matplotlib import rcParams
 rcParams['savefig.dpi']    = 200
-rcParams['savefig.format'] = 'pdf' # or 'png' or 'jpg'
+rcParams['savefig.format'] = 'pdf' # 'pdf' or 'png' or 'jpg'
 
 
 ### 18O/16O ACID FRACTIONATION AS A FUNCTION OF ACID TEMPERATURE
@@ -698,7 +698,7 @@ ETH-1/2/3/4 vs H/EG
 		savefig('output/ETH1234_vs_HEG/Fig_4_ETH1234_new_vs_old')
 
 		for u,x,y in zip(['ETH-1', 'ETH-2', 'ETH-3', 'ETH-4'], X, Y):
-			print(f'Offset from old to new values of {u} is {(y-x)*1000:.1f} ppm ({(y-a*x-b)*1000:+.1f} ppm from the linear scaling in Fig. 4)')
+			print(f'Offset from old to new values of {u} is {(y-x)*1000:.0f} ppm ({(y-a*x-b)*1000:+.1f} ppm from the linear scaling in Fig. 4)')
 
 		compute_old_to_new_conversion(new_eth_values)
 
