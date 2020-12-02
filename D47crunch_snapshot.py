@@ -242,6 +242,28 @@ def w_avg(X, sX) :
 	return Xavg, sXavg
 
 
+def read_csv(filename, sep = ''):
+	'''
+	Read contents of `filename` in csv format and return a list of dictionaries.
+
+	In the csv string, spaces before and after field separators (`','` by default)
+	are optional.
+
+	__Parameters__
+
+	+ `filename`: the csv file to read
+	+ `sep`: csv separator delimiting the fields. By default, use `,`, `;`, or `\t`,
+	whichever appers most often in the contents of `filename`.
+	'''
+	with open(filename) as fid:
+		txt = fid.read()
+
+	if sep == '':
+		sep = sorted(',;\t', key = lambda x: - txt.count(x))[0]
+	txt = [[x.strip() for x in l.split(sep)] for l in txt.splitlines() if l.strip()]
+	return [{k: smart_type(v) for k,v in zip(txt[0], l) if v} for l in txt[1:]]
+
+
 class D47data(list):
 	'''
 	Store and process data for a large set of Δ<sub>47</sub> analyses,
@@ -518,7 +540,7 @@ class D47data(list):
 		'''
 		Read file in csv format to load data into a `D47data` object.
 
-		In the csv file, spaces befor and after field separators (`','` by default)
+		In the csv file, spaces before and after field separators (`','` by default)
 		are optional. Each line corresponds to a single analysis.
 
 		The required fields are:
@@ -546,7 +568,7 @@ class D47data(list):
 		'''
 		Read `txt` string in csv format to load analysis data into a `D47data` object.
 
-		In the csv string, spaces befor and after field separators (`','` by default)
+		In the csv string, spaces before and after field separators (`','` by default)
 		are optional. Each line corresponds to a single analysis.
 
 		The required fields are:
@@ -2018,8 +2040,8 @@ class D47data(list):
 
 		+ `dir`: the directory in which to save the plot
 		'''
-		fig = ppl.figure(figsize = (8,3))
-		ppl.subplots_adjust(.1,.05,.78,.9)
+		fig = ppl.figure(figsize = (8,4))
+		ppl.subplots_adjust(.1,.05,.78,.8)
 		N = len(self.anchors)
 		if N == 3:
 			colorz = {a: c for a,c in zip(self.anchors, [(0,0,1), (1,0,0), (0,2/3,0)])}
@@ -2065,7 +2087,17 @@ class D47data(list):
 
 		ymax = ppl.axis()[3]
 		for s in x_sessions:
-			ppl.text(x_sessions[s], ymax +1, s, va = 'bottom', ha = 'center')
+			ppl.text(
+				x_sessions[s],
+				ymax +1,
+				s,
+				va = 'bottom',
+				**(
+					dict(ha = 'center')
+					if len(self.sessions[s]['data']) > (0.15 * len(self))
+					else dict(ha = 'left', rotation = 45)
+					)
+				)
 
 		for s in self.anchors:
 			kw['marker'] = '+'
