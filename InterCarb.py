@@ -370,7 +370,7 @@ ETH-1/2/3/4 vs H/EG
 				if acid_T == 90:
 					a18_acid = 1.008129 # calcite reacted at 90 °C, [Kim et al., 2007]
 				elif acid_T == 70:
-					a18acid = exp(3.59 / (acid_T + 273.15) - 1.79e-3)
+					a18_acid = exp(3.59 / (acid_T + 273.15) - 1.79e-3)
 				elif acid_T == 25:
 					a18_acid = 1.01025
 				rawdata.wg(a18_acid = a18_acid)
