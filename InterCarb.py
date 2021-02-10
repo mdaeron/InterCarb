@@ -85,7 +85,7 @@ def create_tree(path):
 			os.makedirs('/'.join(splitpath[:k+1]))
 
 
-def summary_of_sessions(labdata, path = 'output/InterCarb/Table_S1_InterCarb_summary.csv'):
+def summary_of_sessions(labdata, path = 'output/InterCarb/Table_2_InterCarb_summary.csv'):
 	'''
 	Generate Table S1
 	'''
@@ -206,7 +206,7 @@ Number of Isoprime MS = {N_Isoprime}
 	savefig(path + 'Fig_8_MS_effects')
 	close(fig)
 	
-	with open(path + 'Table_4_InterCarb_MS_effects.csv', 'w') as f:
+	with open(path + 'Table_5_InterCarb_MS_effects.csv', 'w') as f:
 		f.write('Sample,MAT 253 vs Isoprime 100,Nu Perspective vs MAT 253,Isoprime 100 vs Nu Perspective')
 		for u in UNKNOWNS:
 			f.write(f'\n{u},{out[u]["Thermo vs Isoprime"][0]:.4f} ± {out[u]["Thermo vs Isoprime"][1]:.4f},{out[u]["Nu vs Thermo"][0]:.4f} ± {out[u]["Nu vs Thermo"][1]:.4f},{out[u]["Isoprime vs Nu"][0]:.4f} ± {out[u]["Isoprime vs Nu"][1]:.4f}')
@@ -287,7 +287,7 @@ Number of labs using 25 ºC acid = {N_25C}
 	savefig(path + 'Fig_7_Acid_T_effects')
 	close(fig)
 
-	with open(path + 'Table_3_InterCarb_Acid_T_effects.csv', 'w') as f:
+	with open(path + 'Table_4_InterCarb_Acid_T_effects.csv', 'w') as f:
 		f.write('Sample,Δ47 (70 ºC acid),Δ47 (90 ºC acid),Difference')
 		for u in UNKNOWNS:
 			f.write(f'\n{u},{out[u][70]["D47"]:.4f} ± {out[u][70]["SE_D47"]:.4f},{out[u][90]["D47"]:.4f} ± {out[u][90]["SE_D47"]:.4f},{out[u][90]["D47"]-out[u][70]["D47"]:.4f} ± {sqrt(out[u][70]["SE_D47"]**2 + out[u][90]["SE_D47"]**2):.4f}')
@@ -302,8 +302,8 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 	Write detailed InterCarb results to Table 3
 	'''
 	create_tree(path)
-	with open(f'{path}Table_S3_InterCarb_results.csv', 'w') as fid:
-		with open(f'{path}Table_2_InterCarb_results.csv', 'w') as fid2:
+	with open(f'{path}Table_S2_InterCarb_results.csv', 'w') as fid:
+		with open(f'{path}Table_3_InterCarb_results.csv', 'w') as fid2:
 			fid.write('Lab,Session,' + ','.join(UNKNOWNS))
 			fid2.write(',' + ','.join([f'{u},{u}' for u in UNKNOWNS]))
 			fid2.write('\nLab,' + ','.join(['Δ47 (‰ I-CDES; 95 % CL), N' for u in UNKNOWNS]))
@@ -743,7 +743,7 @@ def run_InterCarb():
 
 
 		if SAVE_RAWDATA:
-			save_rawdata([], 'output/InterCarb/Table_S2_InterCarb_data.csv')
+			save_rawdata([], 'output/InterCarb/Table_S1_InterCarb_data.csv')
 		
 		labdata = {}
 		InterCarb_results = {}
@@ -762,7 +762,7 @@ def run_InterCarb():
 				rd.standardize(method = 'indep_sessions')
 				labdata[lab][session] = rd
 				if SAVE_RAWDATA:
-					save_rawdata(rd, 'output/InterCarb/Table_S2_InterCarb_data.csv', 'a')
+					save_rawdata(rd, 'output/InterCarb/Table_S1_InterCarb_data.csv', 'a')
 				for u in UNKNOWNS:
 					if u in rd.unknowns:
 						InterCarb_results[lab][session][u] = {k: rd.unknowns[u][k] for k in ['D47', 'SE_D47', 'N']}
