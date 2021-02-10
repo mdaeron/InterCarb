@@ -195,7 +195,7 @@ Number of Isoprime MS = {N_Isoprime}
 					)
 		xmin,xmax = .25, .675
 		p = 1-chi2.cdf(chisq,4)
-		text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n(p = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
+		text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n($\\it{{p}}$ = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
 		plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
 		axis([xmin,xmax,xmin,xmax])
 		xticks([.3,.4,.5,.6])
@@ -276,7 +276,7 @@ Number of labs using 25 ºC acid = {N_25C}
 
 	xmin,xmax = .25, .675
 	p = 1-chi2.cdf(chisq,4)
-	text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n(p = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
+	text(.05, .95, f'RMSWD = {sqrt(chisq/4):.2f}\n($\\it{{p}}$ = {p:.2f})', va = 'top', ha = 'left', size = 9, transform = gca().transAxes)
 	plot([xmin,xmax], [xmin,xmax], 'r-', lw = .75, zorder = -100)
 	axis([xmin,xmax,xmin,xmax])
 	xticks([.3,.4,.5,.6])
@@ -621,7 +621,7 @@ ETH-1/2/3/4 vs H/EG
 			y = norm().cdf(x)
 			plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 			pvalue = kstest(X, 'norm', (0, 1)).pvalue
-			text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 10, transform = gca().transAxes)
+			text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 10, transform = gca().transAxes)
 			axis([x1,x2,y1,y2])
 			text(.1, .9, u, va = 'top', transform = gca().transAxes, weight = 'bold')
 			if k // 2:
@@ -655,7 +655,7 @@ ETH-1/2/3/4 vs H/EG
 		y = norm().cdf(x)
 		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 		pvalue = kstest(X, 'norm', (0, 1)).pvalue
-		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+		text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 		axis([x1,x2,y1,y2])
 		text(.05, .95, 'All samples', va = 'top', transform = gca().transAxes, weight = 'bold')
 		xlabel('$\\rm{Weighted}$ Δ$_{47}\\rm{~deviation}$\n$\\rm{of~each~laboratory}$', style = 'italic')
@@ -1048,7 +1048,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_re
 # 			text(0.02, 0.02,
 # 				f'RMSWD = {(chisq_t/Nf)**.5:.2f}',
 # 				**kw)
-		ylabel('Δ$_{47}$ (‰, I-CDES)')
+		ylabel('Δ$_{47}\\rm{~(‰,~I}$-$\,\\rm{CDES}$)', style = 'italic')
 
 	for ks, sample in enumerate(UNKNOWNS):
 		sca(axes[ks])
@@ -1114,7 +1114,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 		pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
 		text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+		text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 		axis([x1,x2,y1,y2])
 		yticks([])
 		xlabel('Sigma-deviation\nof each laboratory')
@@ -1123,7 +1123,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 		pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
 		text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+		text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 		axis([x1,x2,y1,y2])
 		yticks([])
 		xticks([])
@@ -1143,7 +1143,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 	pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
 	text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-	text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+	text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 	axis([x1,x2,y1,y2])
 	xlabel('Sigma-deviation\nof each laboratory')
 	ylabel('Cumulative\ndistribution', labelpad = -8)
@@ -1156,7 +1156,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
 	pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
 	text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
-	text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
+	text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 	axis([x1,x2,y1,y2])
 	ylabel('Cumulative\ndistribution', labelpad = -8)
 	xticks([])
