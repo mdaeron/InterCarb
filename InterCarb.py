@@ -87,7 +87,7 @@ def create_tree(path):
 
 def summary_of_sessions(labdata, path = 'output/InterCarb/Table_2_InterCarb_summary.csv'):
 	'''
-	Generate Table S1
+	Generate Table 2
 	'''
 	create_tree(path)
 	with open(path, 'w') as f:
@@ -299,7 +299,7 @@ Number of labs using 25 ºC acid = {N_25C}
 
 def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 	'''
-	Write detailed InterCarb results to Table 3
+	Write detailed InterCarb results to Table S2
 	'''
 	create_tree(path)
 	with open(f'{path}Table_S2_InterCarb_results.csv', 'w') as fid:
@@ -462,6 +462,7 @@ ETH-1/2/3/4 vs H/EG
 		fig = figure(figsize = (7,5))
 		subplots_adjust(.02, .1, .98, .95, .1, .25)
 		ax = {s: subplot(221+k) for k,s in enumerate(['ETH-4', 'ETH-3', 'ETH-2', 'ETH-1'])}
+		global_xrange = -inf
 
 		new_eth_values = {}
 		for sk, s in enumerate(ax):
@@ -480,6 +481,7 @@ ETH-1/2/3/4 vs H/EG
 				X = labinfo[lab][s]['D47']
 				Y = k
 				eX = labinfo[lab][s]['eD47']
+				
 				errorbar(X, Y, xerr = eX, **kw_errorbar)
 			
 				eX_autogenic = labinfo[lab]['rD47'] / labinfo[lab][s]['N']**.5
@@ -506,14 +508,16 @@ ETH-1/2/3/4 vs H/EG
 						)
 			yticks([])
 			axis([None, None, -1, len(labinfo)])
+			x1,x2 = ax[s].get_xlim()
+			global_xrange = max(global_xrange, x2-x1)
 			if sk > 1:
-				xlabel('Δ$_{47}$ ($90\,$°C acid)')
+				xlabel('Δ$\\rm{_{47}~(‰, 90\,°C~acid)}$', style = 'italic')
 			text(0, 1.01, s, va = 'bottom', weight = 'bold', size = 12, transform = ax[s].transAxes)
 		
 			axvline(Xo, color = 'r', lw = 1, zorder = -200)
 			text(Xo, len(labinfo)+.1, f'{Xo:.4f}  \n', color = 'r', size = 9, va = 'center', ha = 'right', weight = 'bold')
 			text(Xo, len(labinfo)+.1, '±\n', color = 'r', size = 9, va = 'center', ha = 'center', weight = 'bold')
-			text(Xo, len(labinfo)+.1, f'  {sXo:.4f} (1SE)\n', color = 'r', size = 9, va = 'center', ha = 'left', weight = 'bold')
+			text(Xo, len(labinfo)+.1, f'  {sXo * F95_1df:.4f} (95 %)\n', color = 'r', size = 9, va = 'center', ha = 'left', weight = 'bold')
 
 			weights = {
 				T: sum([labinfo[lab][s]['wD47'] for lab in labinfo if labinfo[lab]['acid_T'] == T])
@@ -526,6 +530,10 @@ ETH-1/2/3/4 vs H/EG
 	
 			ax[s].xaxis.set_major_locator(MultipleLocator(.050))
 			ax[s].xaxis.set_minor_locator(MultipleLocator(.010))
+
+		for s in ax:
+			x1,x2 = ax[s].get_xlim()
+			ax[s].set_xlim((x1+x2-global_xrange)/2, (x1+x2+global_xrange)/2)
 
 		savefig(f'output/ETH1234_vs_HEG/Fig_2_ETH1234_vs_HEG')
 		close(fig)
@@ -617,7 +625,7 @@ ETH-1/2/3/4 vs H/EG
 			axis([x1,x2,y1,y2])
 			text(.1, .9, u, va = 'top', transform = gca().transAxes, weight = 'bold')
 			if k // 2:
-				xlabel('Weighted Δ$_{47}$ deviation\nof each laboratory')
+				xlabel('$\\rm{Weighted}$ Δ$_{47}\\rm{~deviation}$\n$\\rm{of~each~laboratory}$', style = 'italic')
 			else:
 				xticks([])
 			if k % 2 == 0:
@@ -650,7 +658,7 @@ ETH-1/2/3/4 vs H/EG
 		text(.95, .05, f'p = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
 		axis([x1,x2,y1,y2])
 		text(.05, .95, 'All samples', va = 'top', transform = gca().transAxes, weight = 'bold')
-		xlabel('Weighted Δ$_{47}$ deviation\nof each laboratory')
+		xlabel('$\\rm{Weighted}$ Δ$_{47}\\rm{~deviation}$\n$\\rm{of~each~laboratory}$', style = 'italic')
 		ylabel('Cumulative\ndistribution', labelpad = -8)
 		yticks([0,1])
 
@@ -693,8 +701,8 @@ ETH-1/2/3/4 vs H/EG
 		text(.0266+0.07, 0.0266+0.025, '+0.05 ‰ (partial re-equilibration of HG?)', va = 'center', ha = 'left', color = 'r', size = 9)
 
 		axis([0, 1, 0, 1])
-		xlabel('Previously determined values\n(Bernasconi et al., 2018)')
-		ylabel('New values (this study) + 0.088 ‰')
+		xlabel('$\\rm{Previously~determined~}$Δ$_{47}\\rm{~values}$\n$\\rm{(Bernasconi~et~al}$., $\\rm{2018)}$', style = 'italic')
+		ylabel('$\\rm{New~}$Δ$_{47}\\rm{~values~(this~study) + 0.088~‰}$', style = 'italic')
 		legend(prop = {'size': 9})
 		savefig('output/ETH1234_vs_HEG/Fig_3_ETH1234_new_vs_old')
 
