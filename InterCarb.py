@@ -306,7 +306,7 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 		with open(f'{path}Table_2_InterCarb_results.csv', 'w') as fid2:
 			fid.write('Lab,Session,' + ','.join(UNKNOWNS))
 			fid2.write(',' + ','.join([f'{u},{u}' for u in UNKNOWNS]))
-			fid2.write('\nLab,' + ','.join(['Δ47 (‰ I-CDES ± 1SE), N' for u in UNKNOWNS]))
+			fid2.write('\nLab,' + ','.join(['Δ47 (‰ I-CDES; 95 % CL), N' for u in UNKNOWNS]))
 			for lab in sorted(InterCarb_results):
 				if lab not in UNKNOWNS:
 					for session in sorted(InterCarb_results[lab]):
@@ -322,7 +322,7 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 					for u in UNKNOWNS:
 						try:
 							fid.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
-							fid2.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]:.4f}')
+							fid2.write(f',{InterCarb_results[lab][u]["D47"]:.4f} ± {InterCarb_results[lab][u]["SE_D47"]*F95_1df:.4f}')
 							fid2.write(f',{InterCarb_results[lab][u]["N"]}')
 						except KeyError:
 							fid.write(f',—')
@@ -331,7 +331,7 @@ def save_InterCarb_results(InterCarb_results, path = 'output/InterCarb/'):
 			fid2.write('\nw. avg')
 			for u in UNKNOWNS:
 				fid.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f}')
-				fid2.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]:.4f},{InterCarb_results[u]["N"]}')
+				fid2.write(f',{InterCarb_results[u]["D47"]:.4f} ± {InterCarb_results[u]["SE_D47"]*F95_1df:.4f},{InterCarb_results[u]["N"]}')
 		
 
 def ETH1234_vs_HEG():
@@ -973,7 +973,7 @@ Standardization errors are mapped as gray contours.
 
 def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_results'):
 	'''
-	Generate Figure 5
+	Generate Figure 4
 	'''
 	
 	create_tree(path)
@@ -1031,7 +1031,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_re
 		xticks([])
 		kw = dict(size = 10, transform = gca().transAxes, va = 'bottom' if sample == 'MERCK' else 'top', ha = 'left')
 		text(0.03, 0.01 if sample == 'MERCK' else 0.98,
-			f"$\\mathbf{{{sample}}}$: {InterCarb_results[sample]['D47']:.4f} ± {InterCarb_results[sample]['SE_D47']:.4f} ‰ (1SE)",
+			f"$\\mathbf{{{sample}}}$: {InterCarb_results[sample]['D47']:.4f} ± {InterCarb_results[sample]['SE_D47']*F95_1df:.4f} ‰ (95 %)",
 			**kw)
 # 		if Nf:
 # 			p = 1-chi2.cdf(chisq_t,Nf)
