@@ -6,9 +6,9 @@ Data processing for the InterCarb exercise
 
 __author__	= 'Mathieu Daëron'
 __contact__   = 'daeron@lsce.ipsl.fr'
-__copyright__ = 'Copyright (c) 2020 Mathieu Daëron'
+__copyright__ = 'Copyright (c) 2021 Mathieu Daëron'
 __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__date__	  = '2020-10'
+__date__	  = '2021-03'
 
 VERBOSE =			 False
 RUN_ETH1234_VS_HEG = True
