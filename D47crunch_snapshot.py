@@ -13,8 +13,8 @@ __author__    = 'Mathieu Daëron'
 __contact__   = 'daeron@lsce.ipsl.fr'
 __copyright__ = 'Copyright (c) 2020 Mathieu Daëron'
 __license__   = 'Modified BSD License - https://opensource.org/licenses/BSD-3-Clause'
-__date__      = '2020-09-30'
-__version__   = '0.6.2dev1'
+__date__      = '2021-03-04'
+__version__   = '1.1.0'
 
 import os
 import numpy as np
@@ -354,10 +354,14 @@ class D47data(list):
 
 
 	Nominal_D47 = {
-		'ETH-1': 0.258,
-		'ETH-2': 0.256,
-		'ETH-3': 0.691,
-		}	# (Bernasconi et al., 2018)
+		'ETH-1':   0.2052,
+		'ETH-2':   0.2085,
+		'ETH-3':   0.6132,
+		'ETH-4':   0.4511,
+		'IAEA-C1': 0.3018,
+		'IAEA-C2': 0.6409,
+		'MERCK':   0.5135,
+		} # I-CDES (Bernasconi et al., 2021)
 	'''
 	Nominal Δ<sub>47</sub> values assigned to the anchor samples, used by
 	`D47data.standardize()` to standardize unknown samples to an absolute Δ<sub>47</sub>
@@ -2129,6 +2133,131 @@ class D47data(list):
 		ppl.axis([-1, len(self), None, None])
 		ppl.savefig(f'{dir}/D47_residuals.pdf')
 		ppl.close(fig)
+
+	def simulate(self,
+		samples = [
+			dict(Sample = 'ETH-1', N = 4),
+			dict(Sample = 'ETH-2', N = 4),
+			dict(Sample = 'ETH-3', N = 4),
+			dict(
+				Sample = 'FOO',
+				d47 = 0.,
+				D47 = 0.5,
+				N = 4,
+				),
+			],
+		a = 1.,
+		b = 0.,
+		c = -0.9,
+		rD47 = 0.015,
+		seed = 0,
+		):
+		'''
+		Populate `D47data` instance with simulated analyses from a single session.
+		
+		__Parameters__
+
+		+ `samples`: a list of entries; each entry is a dictionary with the following fields:
+		    * `Sample`: the name of the sample
+		    * either `d47` (the δ<sub>47</sub> value of this sample), or `d13C_VPDB` and `d18O_VPDB` (its δ<sup>13</sup>C<sub>VPDB</sub> and δ<sup>18</sup>O<sub>VPDB</sub> values)
+		    * `D47`: the absolute Δ<sub>47</sub> value of this sample
+		    * `N`: how many analyses of this sample should be generated
+		+ `a`: scrambling factor)
+		+ `b`: compositional nonlinearity
+		+ `c`: working gas offset
+		+ `rD47`: Δ<sub>47</sub> repeatability
+		+ `seed`: explicitly set to a non-zero value to achieve random but repeatable simulations
+		
+		Beware that `d47` values computed from `d13C_VPDB` and `d18O_VPDB` are calculated assuming
+		a working gas with δ<sup>13</sup>C<sub>VPDB</sub>&nbsp;=&nbsp;0 and δ<sup>18</sup>O<sub>VSMOW</sub>&nbsp;=&nbsp;0.
+		In the unusual case where simulating a different working gas composition is necessary, `d47` must be specified explicitly.
+		
+		Samples already defined in `D47data.Nominal_d13C_VPDB`, `D47data.Nominal_d18O_VPDB`, and `D47data.Nominal_D47`
+		do not require explicit `d47`, `D47`, `d13C_VPDB` nor `d18O_VPDB` (the nominal values will be used by default).
+		
+		Here is an example of using this method to simulate a given combination of anchors and unknowns:
+
+		````py
+		import D47crunch
+		D = D47crunch.D47data()
+		D.simulate([
+		    dict(Sample = 'ETH-1', N = 6),
+		    dict(Sample = 'ETH-2', N = 6),
+		    dict(Sample = 'ETH-3', N = 12),
+		    dict(Sample = 'FOO', d13C_VPDB = -5., d18O_VPDB = -10., D47 = 0.3, N = 4),
+		    ], rD47 = 0.010)
+		D.standardize()
+		D.plot_sessions()
+		D.verbose = True
+		out = D.table_of_samples()
+		````
+		
+		This should output something like:
+		
+		````
+		[table_of_samples] 
+		––––––  ––  –––––––––  ––––––––––  ––––––  ––––––  ––––––––  ––––––  ––––––––
+		Sample   N  d13C_VPDB  d18O_VSMOW     D47      SE    95% CL      SD  p_Levene
+		––––––  ––  –––––––––  ––––––––––  ––––––  ––––––  ––––––––  ––––––  ––––––––
+		ETH-1    6        nan         nan  0.2052                    0.0076          
+		ETH-2    6        nan         nan  0.2085                    0.0089          
+		ETH-3   12        nan         nan  0.6132                    0.0118          
+		FOO      4        nan         nan  0.3031  0.0057  ± 0.0118  0.0104     0.572
+		––––––  ––  –––––––––  ––––––––––  ––––––  ––––––  ––––––––  ––––––  ––––––––
+		````
+		'''
+		from numpy import random as nprandom
+		if seed:
+			rng = nprandom.default_rng(seed)
+		else:
+			rng = nprandom.default_rng()
+
+		N = sum([s['N'] for s in samples])
+		errors = rng.normal(loc = 0, scale = 1, size = N) # generate random measurement errors
+		errors *= rD47 / stdev(errors) # scale errors to rD47
+		
+		k = 0
+		for s in samples:
+		
+			if 'D47' not in s:
+				if s['Sample'] not in self.Nominal_D47:
+					raise KeyError(f"Sample {s['Sample']} is missing a D47 value and it is not defined in Nominal_D47")
+				else:
+					s['D47'] = self.Nominal_D47[s['Sample']]					
+
+			if 'd47' not in s:
+				if s['Sample'] not in self.Nominal_d13C_VPDB or s['Sample'] not in self.Nominal_d18O_VPDB:
+					if 'd13C_VPDB' not in s or 'd18O_VPDB' not in s:
+						raise KeyError(f"Sample {s['Sample']} is missing a d47 value and it is not defined in Nominal_d13C_VPDB and Nominal_d18O_VPDB")
+					else:
+						R47wg = self.compute_isobar_ratios(self.R13_VPDB, self.R18_VPDB * self.ALPHA_18O_ACID_REACTION)[2]
+						R47s = self.compute_isobar_ratios(
+							self.R13_VPDB * (1 + s['d13C_VPDB']/1000),
+							self.R18_VPDB * (1 + s['d18O_VPDB']/1000) * self.ALPHA_18O_ACID_REACTION,
+							)[2]*(1+s['D47']/1000)
+						s['d47'] = (R47s/R47wg-1)*1000
+				else:
+					R47wg = self.compute_isobar_ratios(self.R13_VPDB, self.R18_VPDB * self.ALPHA_18O_ACID_REACTION)[2]
+					R47s = self.compute_isobar_ratios(
+						self.R13_VPDB * (1 + self.Nominal_d13C_VPDB[s['Sample']]/1000),
+						self.R18_VPDB * (1 + self.Nominal_d18O_VPDB[s['Sample']]/1000) * self.ALPHA_18O_ACID_REACTION,
+						)[2]*(1+s['D47']/1000)
+					s['d47'] = (R47s/R47wg-1)*1000
+					
+			while s['N']:
+				self.append({
+					'Sample': s['Sample'],
+					'd13Cwg_VPDB': np.nan,
+					'd18Owg_VSMOW': np.nan,
+					'd13C_VPDB': np.nan,
+					'd18O_VSMOW': np.nan,
+					'd47': s['d47'],
+					'D47raw': a * (s['D47'] + errors[k]) + b * s['d47'] + c,
+					})
+				s['N'] -= 1
+				k += 1
+
+		self.refresh()
 
 class SessionPlot():
 	def __init__(self):

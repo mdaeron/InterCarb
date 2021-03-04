@@ -281,8 +281,8 @@ Number of labs using 25 ºC acid = {N_25C}
 	axis([xmin,xmax,xmin,xmax])
 	xticks([.3,.4,.5,.6])
 	yticks([.3,.4,.5,.6])
-	xlabel('70 ºC acid reaction')
-	ylabel('90 ºC acid reaction')
+	xlabel('Δ$\\rm{_{47}~(70\,°C~acid~reactions,~‰)}$', style = 'italic')
+	ylabel('Δ$\\rm{_{47}~(90\,°C~acid~reactions,~‰)}$', style = 'italic')
 
 	savefig(path + 'Fig_7_Acid_T_effects')
 	close(fig)
@@ -511,13 +511,11 @@ ETH-1/2/3/4 vs H/EG
 			x1,x2 = ax[s].get_xlim()
 			global_xrange = max(global_xrange, x2-x1)
 			if sk > 1:
-				xlabel('Δ$\\rm{_{47}~(‰, 90\,°C~acid)}$', style = 'italic')
+				xlabel('Δ$\\rm{_{47}~(‰,~90\,°C~acid)}$', style = 'italic')
 			text(0, 1.01, s, va = 'bottom', weight = 'bold', size = 12, transform = ax[s].transAxes)
 		
 			axvline(Xo, color = 'r', lw = 1, zorder = -200)
-			text(Xo, len(labinfo)+.1, f'{Xo:.4f}  \n', color = 'r', size = 9, va = 'center', ha = 'right', weight = 'bold')
-			text(Xo, len(labinfo)+.1, '±\n', color = 'r', size = 9, va = 'center', ha = 'center', weight = 'bold')
-			text(Xo, len(labinfo)+.1, f'  {sXo * F95_1df:.4f} (95 %)\n', color = 'r', size = 9, va = 'center', ha = 'left', weight = 'bold')
+			text(Xo, len(labinfo)+.1, f'{Xo:.4f} ± {sXo * F95_1df:.4f} ‰ (95 %)\n', color = 'r', size = 9, va = 'center', ha = 'center', weight = 'bold')
 
 			weights = {
 				T: sum([labinfo[lab][s]['wD47'] for lab in labinfo if labinfo[lab]['acid_T'] == T])
@@ -701,7 +699,7 @@ ETH-1/2/3/4 vs H/EG
 		text(.0266+0.07, 0.0266+0.025, '+0.05 ‰ (partial re-equilibration of HG?)', va = 'center', ha = 'left', color = 'r', size = 9)
 
 		axis([0, 1, 0, 1])
-		xlabel('$\\rm{Previously~determined~}$Δ$_{47}\\rm{~values}$\n$\\rm{(Bernasconi~et~al}$., $\\rm{2018)}$', style = 'italic')
+		xlabel('$\\rm{Previously~determined~}$Δ$_{47}\\rm{~values~(‰)}$\n$\\rm{(Bernasconi~et~al}$., $\\rm{2018)}$', style = 'italic')
 		ylabel('$\\rm{New~}$Δ$_{47}\\rm{~values~(this~study) + 0.088~‰}$', style = 'italic')
 		legend(prop = {'size': 9})
 		savefig('output/ETH1234_vs_HEG/Fig_3_ETH1234_new_vs_old')
