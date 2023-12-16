@@ -27,6 +27,7 @@ from matplotlib import rcParams
 rcParams['savefig.dpi']    = 200
 rcParams['savefig.format'] = IMAGE_FORMAT
 
+import black_hat
 
 ### 18O/16O ACID FRACTIONATION AS A FUNCTION OF ACID TEMPERATURE
 ### (Kim et al., 2015) <https://doi.org/10.1016/j.gca.2015.02.011>
@@ -1004,7 +1005,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_re
 			errorbar( x, InterCarb_results[lab][sample]['D47'], F95_1df * InterCarb_results[lab][sample]['SE_D47'],
 				marker = 'None',
 				ls = 'None',
-				ecolor = 'k',
+				ecolor = 'w',
 				elinewidth = 1,
 				capsize = 4,
 				capthick = 1,
@@ -1013,8 +1014,8 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_re
 			gca().add_patch(Rectangle(
 				(x-rect_width/2,InterCarb_results[lab][sample]['autogenic_D47']-F95_1df*InterCarb_results[lab][sample]['autogenic_SE_D47']), rect_width, 3.92*InterCarb_results[lab][sample]['autogenic_SE_D47'],
 				linewidth = 1,
-				edgecolor = 'k',
-				facecolor = 'w',
+				edgecolor = 'w',
+				facecolor = 'k',
 				zorder = 100,
 				))
 			y_inf = min(y_inf, InterCarb_results[lab][sample]['D47'] - F95_1df * InterCarb_results[lab][sample]['SE_D47'])
@@ -1026,7 +1027,7 @@ def interlab_plot(InterCarb_results, path = 'output/InterCarb/Fig_4_InterCarb_re
 				str(int(lab[-2:])),
 				ha = 'center',
 				va = 'center',
-				color = (0,0,.5),
+				color = (.6,.6,.6),
 				size = 7,
 				)
 
@@ -1087,18 +1088,18 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 		sdev += dev
 		sdevu += devu
 
-		col1, col2 = [0]*3, [0]*3
+		col1, col2 = [1]*3, [1]*3
 		sca(myaxes[k+1])
 		X = array(dev)
 		Y = arange(N)/(N-1)
 		plot(X, Y, '-', lw = .75, color = col1)
-		plot(X, Y, 'wo', mec = col1, mew = .75, ms = 3.5)
+		plot(X, Y, 'ko', mec = col1, mew = .75, ms = 3.5)
 		x1,x2,y1,y2 = axis()
 
 		sca(myaxes[k+6])
 		Xu = array(devu)
 		plot(Xu, Y, '-', lw = .75, color = col2)
-		plot(Xu, Y, 'wo', mec = col2, mew = .75, ms = 3.5)
+		plot(Xu, Y, 'ko', mec = col2, mew = .75, ms = 3.5)
 		x3,x4,y3,y4 = axis()
 		
 		x1 = -7.5
@@ -1109,7 +1110,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 		sca(myaxes[k+1])
 		x = linspace(x1, x2)
 		y = norm().cdf(x)
-		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+		plot(x,y,'-', lw = 1.5, zorder = -10, color = [.8,0,0])
 		pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
 		text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
 		text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
@@ -1118,7 +1119,7 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 		xlabel('Sigma-deviation\nof each laboratory')
 
 		sca(myaxes[k+6])
-		plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+		plot(x,y,'-', lw = 1.5, zorder = -10, color = [.8,0,0])
 		pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
 		text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
 		text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
@@ -1135,10 +1136,10 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 	X = array(sdev)
 	Y = arange(N)/(N-1)
 	plot(X, Y, '-', lw = .75, color = col1)
-	plot(X, Y, 'wo', mec = col1, mew = .5, ms = 2)
+	plot(X, Y, 'ko', mec = col1, mew = .3, ms = 3)
 	x = linspace(x1, x2)
 	y = norm().cdf(x)
-	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+	plot(x,y,'-', lw = 3, zorder = -10, color = [.8,0,0])
 	pvalue = kstest(X, 'norm', (0, 1), mode = 'asymp').pvalue
 	text(.03, .97, f'fully propagated\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
 	text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
@@ -1150,8 +1151,8 @@ def KS_tests(InterCarb_results, path = 'output/InterCarb/Fig_5_InterCarb_KS_test
 	sca(myaxes[5])
 	Xu = array(sdevu)
 	plot(Xu, Y, '-', lw = .75, color = col2)
-	plot(Xu, Y, 'wo', mec = col2, mew = .5, ms = 2)
-	plot(x,y,'-', lw = 2, zorder = -10, color = [.6,.8,1])
+	plot(Xu, Y, 'ko', mec = col2, mew = .3, ms = 3)
+	plot(x,y,'-', lw = 3, zorder = -10, color = [.8,0,0])
 	pvalue = kstest(Xu, 'norm', (0, 1), mode = 'asymp').pvalue
 	text(.03, .97, f'not accounting for\nstandardization\nerrors', va = 'top', ha = 'left', size = 8, transform = gca().transAxes)
 	text(.95, .05, f'$\\it{{p}}$ = {100*pvalue:{".0f" if pvalue>0.1 else ".1f"}} %', va = 'bottom', ha = 'right', size = 12, transform = gca().transAxes)
